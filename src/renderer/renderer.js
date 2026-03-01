@@ -38,8 +38,18 @@ let CANNON = null;
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('VOID IDE initializing...');
   
+  // Wait a bit for layout
+  await new Promise(r => setTimeout(r, 100));
+  
   // Load Three.js and Cannon.js
   await loadEngine();
+  
+  // Check if Three.js loaded
+  if (!THREE) {
+    console.error('Three.js not loaded!');
+    updateStatus('Error: Three.js failed to load');
+    return;
+  }
   
   // Initialize 3D viewport
   initViewport();
@@ -63,51 +73,80 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateStatus('VOID IDE Ready - All systems online');
 });
 
-// Load Three.js and Cannon.js from CDN
+// Load Three.js and Cannon.js from local files
 async function loadEngine() {
   return new Promise((resolve) => {
-    // Load Three.js
-    const threeScript = document.createElement('script');
-    threeScript.src = 'lib/three.min.js';
-    threeScript.onload = () => {
-      THREE = window.THREE || window.three;
-      if (!THREE) {
-        // Try to find Three.js in window
-        for (let key in window) {
-          if (key.toLowerCase().includes('three')) {
-            THREE = window[key];
-            break;
-          }
-        }
+    // Wait for DOM
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', () => loadEngine().then(resolve));
+      return;
+    }
+    
+    // Check if already loaded
+    if (window.THREE) {
+      THREE = window.THREE;
+      console.log('Three.js already loaded:', THREE.VERSION);
+      if (window.CANNON) {
+        CANNON = window.CANNON;
+        console.log('Cannon.js already loaded');
       }
-      console.log('Three.js loaded:', THREE?.version);
+      resolve();
+      return;
+    }
+    
+    // Load Three.js from local lib
+    const threeScript = document.createElement('script');
+    threeScript.src = './lib/three.min.js';
+    threeScript.onload = () => {
+      THREE = window.THREE;
+      console.log('Three.js loaded:', THREE?.VERSION || 'unknown');
       
-      // Load Cannon.js for physics
+      if (!THREE) {
+        console.error('THREE not found after load!');
+        resolve();
+        return;
+      }
+      
+      // Load Cannon.js
       const cannonScript = document.createElement('script');
-      cannonScript.src = 'lib/cannon-es.js';
+      cannonScript.src = './lib/cannon-es.js';
       cannonScript.onload = () => {
-        CANNON = window.CANNON || window.cannon;
+        CANNON = window.CANNON;
         console.log('Cannon.js loaded');
         resolve();
       };
       cannonScript.onerror = () => {
-        console.log('Cannon.js failed, continuing without physics');
+        console.log('Cannon.js failed to load, continuing without physics');
         resolve();
       };
-      document.head.appendChild(cannonScript);
+      document.body.appendChild(cannonScript);
     };
-    threeScript.onerror = () => {
-      console.error('Failed to load Three.js');
-      // Try to continue anyway
+    threeScript.onerror = (e) => {
+      console.error('Failed to load Three.js:', e);
       resolve();
     };
-    document.head.appendChild(threeScript);
+    document.body.appendChild(threeScript);
   });
 }
 
 // Initialize 3D Viewport
 function initViewport() {
   const canvas = document.getElementById('viewport');
+  
+  if (!canvas) {
+    console.error('Canvas not found!');
+    return;
+  }
+  
+  // Force canvas to have proper size
+  const container = canvas.parentElement;
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 600;
+  
+  canvas.width = width;
+  canvas.height = height;
+  
+  console.log('Initializing viewport:', width, 'x', height);
   
   // Scene
   scene = new THREE.Scene();
@@ -117,18 +156,25 @@ function initViewport() {
   scene.fog = new THREE.Fog(0x1a1a2e, 20, 100);
   
   // Camera
-  camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.set(8, 8, 8);
   camera.lookAt(0, 0, 0);
   
   // Renderer with advanced features
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    console.log('WebGL renderer created successfully');
+  } catch (e) {
+    console.error('WebGL error:', e);
+    updateStatus('WebGL not supported!');
+    return;
+  }
   
   // Advanced Lighting
   setupAdvancedLighting();
@@ -147,6 +193,18 @@ function initViewport() {
   animate();
   
   // Handle resize
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    canvas.width = w;
+    canvas.height = h;
+  });
+  
+  console.log('Viewport initialized');
+}
   window.addEventListener('resize', () => {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
