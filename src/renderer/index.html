@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:;">
+  <title>VOID IDE - AI Game Engine</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Title Bar -->
+    <header class="title-bar">
+      <div class="title-bar-drag">
+        <span class="logo">🚀 VOID IDE</span>
+        <span class="project-name" id="projectName">No project open</span>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Left Panel -->
+      <aside class="left-panel">
+        <!-- World Outliner -->
+        <div class="panel world-outliner">
+          <div class="panel-header">
+            <span>🌍 WORLD OUTLINER</span>
+            <button onclick="addObject()" title="Add Object">+</button>
+          </div>
+          <div class="panel-content" id="worldOutliner">
+            <div class="empty-state">No objects in scene</div>
+          </div>
+        </div>
+
+        <!-- Assets -->
+        <div class="panel assets-panel">
+          <div class="panel-header">
+            <span>📦 ASSETS</span>
+            <button onclick="importAssets()" title="Import">+</button>
+          </div>
+          <div class="panel-content" id="assetsPanel">
+            <div class="empty-state">No assets</div>
+          </div>
+        </div>
+
+        <!-- Characters -->
+        <div class="panel characters-panel">
+          <div class="panel-header">
+            <span>👥 CHARACTERS</span>
+          </div>
+          <div class="panel-content">
+            <button class="char-btn" onclick="addCharacter('player')">👤 Add Player</button>
+            <button class="char-btn" onclick="addCharacter('enemy')">👾 Add Enemy</button>
+          </div>
+        </div>
+
+        <!-- AI Tools -->
+        <div class="panel ai-tools">
+          <div class="panel-header">
+            <span>🤖 AI TOOLS</span>
+          </div>
+          <div class="panel-content">
+            <button class="ai-btn" onclick="aiGenerateWorld()">🌍 Generate World</button>
+            <button class="ai-btn" onclick="aiGenerateLevel()">📐 Generate Level</button>
+            <button class="ai-btn" onclick="aiGenerateCode()">💻 Write Code</button>
+            <button class="ai-btn" onclick="aiGenerateAssets()">🎨 Create Assets</button>
+            <button class="ai-btn" onclick="aiPlaytest()">🎮 AI Playtest</button>
+            <button class="ai-btn" onclick="aiAutoBalance()">⚖️ Auto-Balance</button>
+            <button class="ai-btn" onclick="aiFindBugs()">🐛 Find Bugs</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Area -->
+      <main class="center-area">
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="tool-group">
+            <button onclick="setMode('select')" id="tool-select" class="tool active" title="Select (V)">🖱️</button>
+            <button onclick="setMode('move')" id="tool-move" class="tool" title="Move (G)">✥</button>
+            <button onclick="setMode('rotate')" id="tool-rotate" class="tool" title="Rotate (R)">↻</button>
+            <button onclick="setMode('scale')" id="tool-scale" class="tool" title="Scale (S)">⬜</button>
+          </div>
+          <div class="tool-group">
+            <button onclick="addPrimitive('cube')" title="Cube">🧊</button>
+            <button onclick="addPrimitive('sphere')" title="Sphere">⚪</button>
+            <button onclick="addPrimitive('plane')" title="Plane">▬</button>
+            <button onclick="addPrimitive('cylinder')" title="Cylinder">⬭</button>
+            <button onclick="addPrimitive('cone')" title="Cone">🔺</button>
+            <button onclick="addPrimitive('torus')" title="Torus">🍩</button>
+          </div>
+          <div class="tool-group">
+            <button onclick="addLight('directional')" title="Sun">☀️</button>
+            <button onclick="addLight('point')" title="Point Light">💡</button>
+            <button onclick="addLight('spot')" title="Spot Light">🔦</button>
+            <button onclick="addLight('ambient')" title="Ambient">🌙</button>
+          </div>
+          <div class="tool-group">
+            <button onclick="togglePhysics()" title="Toggle Physics">⚛️</button>
+            <button onclick="initMultiplayer()" title="Multiplayer">🌐</button>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport-container">
+          <canvas id="viewport"></canvas>
+          <div class="viewport-overlay">
+            <span id="viewportInfo">3D Viewport | Objects: 0 | Physics: OFF</span>
+          </div>
+        </div>
+
+        <!-- Code Editor -->
+        <div class="code-panel">
+          <div class="code-tabs">
+            <div class="code-tab active">game.js</div>
+          </div>
+          <div class="code-editor">
+            <textarea id="codeEditor" spellcheck="false" placeholder="// Write your game code here...
+// Or use AI to generate it!"></textarea>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel -->
+      <aside class="right-panel">
+        <!-- Properties -->
+        <div class="panel properties-panel">
+          <div class="panel-header">
+            <span>⚙️ PROPERTIES</span>
+          </div>
+          <div class="panel-content" id="propertiesPanel">
+            <div class="property-group">
+              <label>Name</label>
+              <input type="text" id="prop-name" value="Object">
+            </div>
+            <div class="property-group">
+              <label>Position</label>
+              <div class="vec3">
+                <input type="number" id="prop-pos-x" value="0" step="0.1">
+                <input type="number" id="prop-pos-y" value="0" step="0.1">
+                <input type="number" id="prop-pos-z" value="0" step="0.1">
+              </div>
+            </div>
+            <div class="property-group">
+              <label>Rotation</label>
+              <div class="vec3">
+                <input type="number" id="prop-rot-x" value="0" step="1">
+                <input type="number" id="prop-rot-y" value="0" step="1">
+                <input type="number" id="prop-rot-z" value="0" step="1">
+              </div>
+            </div>
+            <div class="property-group">
+              <label>Scale</label>
+              <div class="vec3">
+                <input type="number" id="prop-scale-x" value="1" step="0.1">
+                <input type="number" id="prop-scale-y" value="1" step="0.1">
+                <input type="number" id="prop-scale-z" value="1" step="0.1">
+              </div>
+            </div>
+            <div class="property-group">
+              <label>Material Color</label>
+              <input type="color" id="prop-color" value="#ff0000">
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Assistant -->
+        <div class="panel ai-assistant">
+          <div class="panel-header">
+            <span>🤖 AI ASSISTANT</span>
+          </div>
+          <div class="panel-content">
+            <div class="ai-quick-prompts">
+              <button onclick="askAI('player movement')">🎮 Player</button>
+              <button onclick="askAI('collision')">💥 Collision</button>
+              <button onclick="askAI('shooting')">🔫 Shoot</button>
+              <button onclick="askAI('enemy AI')">👾 Enemy</button>
+              <button onclick="askAI('physics')">⚛️ Physics</button>
+              <button onclick="askAI('multiplayer')">🌐 Network</button>
+            </div>
+            <div class="ai-input">
+              <input type="text" id="aiPrompt" placeholder="Ask AI...">
+              <button onclick="askAI(document.getElementById('aiPrompt').value)">🤖</button>
+            </div>
+            <div class="ai-response" id="aiResponse">
+              <p>👋 Hello! I'm your AI game assistant.</p>
+              <p>Click a prompt or type your own!</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <div class="status-left">
+        <span id="statusMessage">Ready</span>
+      </div>
+      <div class="status-right">
+        <span id="objectCount">Objects: 0</span>
+        <span id="fpsCounter">FPS: 0</span>
+        <span>VOID IDE v1.0</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- AI Modal -->
+  <div class="modal" id="aiModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🤖 AI Generator</h3>
+        <button onclick="closeAIModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-type-selector">
+          <button onclick="selectAIType('world')">🌍 World</button>
+          <button onclick="selectAIType('level')">📐 Level</button>
+          <button onclick="selectAIType('code')">💻 Code</button>
+          <button onclick="selectAIType('assets')">🎨 Assets</button>
+        </div>
+        <textarea id="aiPromptInput" placeholder="Describe what you want AI to create..."></textarea>
+        <button class="ai-generate-btn" onclick="generateWithAI()">🚀 Generate with AI</button>
+        <div class="ai-result" id="aiResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+  <script src="plugins.js"></script>
+</body>
+</html>

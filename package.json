@@ -1,0 +1,48 @@
+{
+  "name": "void-ide",
+  "version": "1.0.0",
+  "description": "VOID IDE - AI-Powered Game Engine",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "build": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:web": "node scripts/build-web.js",
+    "build:mobile": "node scripts/build-mobile.js"
+  },
+  "author": "Void",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "socket.io": "^4.7.0",
+    "socket.io-client": "^4.7.0",
+    "three": "^0.160.0",
+    "ws": "^8.14.0"
+  },
+  "build": {
+    "appId": "com.void.ide",
+    "productName": "VOID IDE",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
