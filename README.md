@@ -1,310 +1,90 @@
-# 🚀 VOID IDE
+# VOID IDE
 
-**AI-Powered Game Engine** - Build games with the power of AI
+A professional web-based game engine with AI integration.
 
-![Electron](https://img.shields.io/badge/Electron-28+-blue)
-![Three.js](https://img.shields.io/badge/Three.js-0.160-orange)
-![Physics](https://img.shields.io/badge/Cannon.js-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Status: In Development
 
----
+This is an ambitious project - building a game engine from scratch with AI at its core. Not finished. Not polished. But we're working on it.
 
-## ⚡ What is VOID IDE?
+## Vision
 
-VOID IDE is a revolutionary game development environment where **AI does everything**:
+A web-based game engine that isn't just another Unity/UE clone - but has AI baked into the foundation. Think: AI-assisted level generation, smart NPCs, natural language scripting, and a voice-controlled editor.
 
-- 🌍 **AI World Generation** - Describe a world, AI builds it
-- 📐 **AI Level Design** - Create levels with prompts  
-- 💻 **AI Code Writing** - Get game code instantly
-- 🎨 **AI Assets** - Generate sprites, textures, sounds
-- 🎮 **AI Playtesting** - Auto-test your games
-- ⚖️ **AI Auto-Balance** - Perfect difficulty every time
-- 🐛 **AI Bug Finding** - Automatic debugging
+## Current Features
 
----
+- Professional dark IDE interface
+- 3D viewport with WebGL rendering (Three.js)
+- Object placement and manipulation
+- Basic scene management
+- Multiple editor panels (Level, Material, Blueprint, Sequence, UI)
 
-## ✅ COMPLETE Roadmap
+## Roadmap
 
-### Core Engine
-| Feature | Status |
-|---------|--------|
-| 3D Viewport (Three.js) | ✅ |
-| Physics Engine (Cannon.js) | ✅ |
-| Scene Outliner | ✅ |
-| Properties Panel | ✅ |
-| Transform Tools | ✅ |
-| Primitives (6 types) | ✅ |
-| Lighting (4 types) | ✅ |
-| Advanced Materials | ✅ |
-| Shadows & Fog | ✅ |
-| Skybox | ✅ |
+### Phase 1 - Foundation
+- [x] Basic IDE UI
+- [x] 3D Viewport
+- [ ] Object placement system
+- [ ] Scene serialization
+- [ ] File management
 
-### AI Features
-| Feature | Status |
-|---------|--------|
-| AI World Generator | ✅ |
-| AI Level Generator | ✅ |
-| AI Code Assistant | ✅ |
-| AI Playtester | ✅ |
-| AI Auto-Balancer | ✅ |
-| AI Bug Finder | ✅ |
-| Asset Generation Guide | ✅ |
+### Phase 2 - Editors
+- [ ] Material Editor (node-based)
+- [ ] Blueprint Editor (visual scripting)
+- [ ] Sequencer (animation timeline)
+- [ ] UI Designer
 
-### Characters & Multiplayer
-| Feature | Status |
-|---------|--------|
-| Player Character | ✅ |
-| Enemy Characters | ✅ |
-| Player Controller Code | ✅ |
-| Enemy AI Code | ✅ |
-| Multiplayer Ready | ✅ |
+### Phase 3 - Core Features
+- [ ] Terrain/Landscape editor
+- [ ] Foliage system
+- [ ] Physics integration
+- [ ] Audio system
 
-### Build Targets
-| Target | Status |
-|--------|--------|
-| Desktop (Windows/Mac/Linux) | ✅ |
-| Web (HTML5) | ✅ |
-| Mobile (Android/iOS) | ✅ |
+### Phase 4 - AI Integration (The "Void" Core)
+- [ ] AI-assisted level generation
+- [ ] Natural language scripting (describe what you want, AI builds it)
+- [ ] Smart NPC behavior trees
+- [ ] Voice-controlled editor commands
+- [ ] Procedural asset generation
+- [ ] AI-powered debugging
 
-### Plugin System
-| Feature | Status |
-|---------|--------|
-| Plugin Manager | ✅ |
-| Debug Plugin | ✅ |
-| Recording Plugin | ✅ |
-| Version Control Plugin | ✅ |
-| Asset Store | ✅ |
-| Team Collaboration | ✅ |
+### Phase 5 - Deployment
+- [ ] WebGL build export
+- [ ] Desktop app wrapper
+- [ ] Mobile support
 
----
+## AI Core Concept
 
-## 🤖 AI Capabilities
-
-### World Generation
-```
-"A futuristic city with neon lights"
-"A fantasy castle with mountains"  
-"A sci-fi space station"
-```
-
-### Level Design
-```
-"5 platformer levels with gaps"
-"A maze with 8 rooms"
-"An arena battleground"
-```
-
-### Code Generation
-```
-"Player movement with WASD and jump"
-"Shooting mechanic with bullets"
-"Enemy AI that chases player"
-"Physics-based movement"
-"Multiplayer networking"
-```
-
----
-
-## 🚀 Installation
-
-```bash
-# Clone
-git clone https://github.com/AlienLost08/void-ide.git
-cd void-ide
-
-# Install
-npm install
-
-# Run
-npm run dev
-
-# Build for Desktop
-npm run build
-
-# Build for Web
-npm run build:web
-
-# Build for Mobile
-npm run build:mobile
-```
-
----
-
-## 📖 Usage
-
-### 1. AI World Generation
-1. Click **🤖 AI TOOLS** → **Generate World**
-2. Describe your world
-3. AI builds everything!
-
-### 2. AI Level Design
-1. Click **Generate Level**
-2. Describe the level type
-3. Platforms, mazes, arenas - done!
-
-### 3. AI Code Writing
-1. Click **Write Code** or use quick prompts
-2. Describe what you need
-3. Player controllers, enemy AI, physics - instant!
-
-### 4. Test & Balance
-1. Press **F5** or click Play
-2. Use **AI Playtest** to auto-test
-3. Use **AI Auto-Balance** for perfect difficulty
-4. Use **AI Find Bugs** to catch issues
-
-### 5. Build & Export
-- Build for Desktop (exe)
-- Build for Web (HTML5)
-- Build for Mobile (Android/iOS)
-
----
-
-## ⌨️ Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| Ctrl+N | New Project |
-| Ctrl+O | Open Project |
-| Ctrl+S | Save |
-| Ctrl+G | AI Generate World |
-| Ctrl+P | Play Game |
-| F1 | AI Assistant |
-| F5 | Play |
-| Shift+F5 | Stop |
-| Delete | Delete Object |
-| Ctrl+D | Duplicate |
-| Escape | Deselect |
-
----
-
-## 🔌 Plugin System
-
-VOID IDE supports plugins to extend functionality:
-
-### Built-in Plugins
-- **Debug Plugin** - Debug tools and logging
-- **Recording Plugin** - Record gameplay
-- **Version Control** - Git-like version history
-- **Asset Store** - Built-in asset library
-- **Collaboration** - Team working together
-
-### Creating Plugins
-```javascript
-const myPlugin = {
-  name: 'my-plugin',
-  version: '1.0.0',
-  init(pm) {
-    // Initialize plugin
-  },
-  hooks: {
-    beforeRender: () => { /* code */ },
-    onObjectAdded: (obj) => { /* code */ }
-  }
-};
-
-voidIDE.plugins.register(myPlugin);
-```
-
----
-
-## 📱 Mobile Build
-
-VOID IDE can build to mobile using Capacitor:
-
-```bash
-# Build web first
-npm run build:web
-
-# Then build mobile
-npm run build:mobile
-
-# This creates:
-# - Android Studio project
-# - Xcode project
-# - Capacitor config
-```
-
----
-
-## 👥 Team Collaboration
-
-Built-in collaboration features:
-- Real-time cursor sharing
-- Object locking
-- Change synchronization
-- User presence indicators
-
----
-
-## 🏗️ Tech Stack
-
-- **Electron** - Desktop framework
-- **Three.js** - 3D rendering
-- **Cannon.js** - Physics engine
-- **Socket.io** - Multiplayer
-- **Capacitor** - Mobile builds
-
----
-
-## 📦 Project Structure
+The "Void" is the AI brain of this engine:
 
 ```
-void-ide/
-├── src/
-│   ├── main/
-│   │   ├── main.js    # Electron main process
-│   │   └── preload.js # Context bridge
-│   └── renderer/
-│       ├── index.html   # UI
-│       ├── styles.css   # Dark theme
-│       ├── renderer.js  # Core engine
-│       └── plugins.js   # Plugin system
-├── scripts/
-│   ├── build-web.js    # Web build
-│   └── build-mobile.js # Mobile build
-├── package.json
-└── README.md
+User: "Create a dark dungeon level with torch lighting and 3 enemies"
+Void AI: *generates terrain, places lighting, adds AI-controlled enemies*
 ```
 
----
+Or:
 
-## 🌟 All Features Complete!
+```
+User: "Add a puzzle where player needs to collect 5 gems to open the door"
+Void AI: *creates gem objects, adds collision, scripts the door unlock*
+```
 
-- ✅ Core 3D Engine
-- ✅ Physics
-- ✅ AI World Generation
-- ✅ AI Level Generation  
-- ✅ AI Code Generation
-- ✅ AI Playtester
-- ✅ AI Auto-Balancer
-- ✅ AI Bug Finder
-- ✅ Characters
-- ✅ Multiplayer Ready
-- ✅ Plugin System
-- ✅ Asset Store
-- ✅ Team Collaboration
-- ✅ Web Build
-- ✅ Mobile Build
+This isn't just copilot. This is the editor understanding game design patterns and building complete systems from descriptions.
 
----
+## Tech Stack
 
-## 🤝 Contributing
+- **Frontend**: Vanilla JS + Three.js
+- **Rendering**: WebGL via Three.js
+- **Physics**: Cannon.js (planned)
+- **AI**: External LLM integration (planned)
 
-Open source! Help build VOID IDE:
+## Contributing
 
-1. Fork the repo
-2. Make changes
-3. Submit a PR
+This is a personal project. But if you're interested in helping build the future of game development, reach out.
+
+## Contact
+
+Built by Satyam with VOID (AI Assistant)
 
 ---
 
-## 📜 License
-
-MIT License
-
----
-
-**VOID IDE** - *Game development, reimagined.*
-
-Built with ❤️ by Void
+*"We're not just building an engine. We're building the future of game creation."*
