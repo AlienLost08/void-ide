@@ -4,87 +4,82 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:;">
-  <title>VOID IDE - Unreal-Class Game Engine</title>
-  <link rel="stylesheet" href="void-ide.css">
+  <title>VOID IDE</title>
   <style>
-    /* UNREAL ENGINE EDITOR LAYOUT */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     :root {
-      --bg-dark: #0d0d12;
-      --bg-darker: #08080c;
-      --bg-panel: #141419;
-      --bg-header: #1a1a22;
-      --border-color: #2a2a35;
-      --accent: #0078ff;
-      --accent-hover: #1a9fff;
-      --text-primary: #e8e8ec;
-      --text-secondary: #9a9aa8;
-      --text-muted: #5c5c6e;
-      --success: #2ecc71;
-      --warning: #f39c12;
-      --error: #e74c3c;
-      --selection: #0078ff40;
+      --bg-1: #0d0d10;
+      --bg-2: #131318;
+      --bg-3: #1a1a22;
+      --bg-4: #222230;
+      --border: #2a2a38;
+      --accent: #6366f1;
+      --accent-dim: #4f46e5;
+      --text: #e2e2e8;
+      --text-dim: #8888a0;
+      --text-off: #555568;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #eab308;
     }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     html, body {
       height: 100%;
       overflow: hidden;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 13px;
-      background: var(--bg-darker);
-      color: var(--text-primary);
+      background: var(--bg-1);
+      color: var(--text);
     }
     
-    #app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+    #app { display: flex; flex-direction: column; height: 100vh; }
     
-    /* ========== MENU BAR ========== */
-    .menu-bar {
-      background: linear-gradient(180deg, #1f1f28 0%, #18181f 100%);
-      height: 29px;
+    /* Title Bar */
+    .title-bar {
+      height: 32px;
+      background: var(--bg-2);
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      border-bottom: 1px solid #000;
-      user-select: none;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border);
       -webkit-app-region: drag;
     }
     
-    .menu-bar-item {
-      padding: 4px 10px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 12px;
-      border-radius: 3px;
-    }
-    
-    .menu-bar-item:hover {
-      background: var(--selection);
-      color: var(--text-primary);
-    }
-    
-    .menu-bar-title {
+    .title-logo {
       font-weight: 600;
       font-size: 13px;
-      color: var(--text-primary);
-      margin-right: 20px;
       letter-spacing: 0.5px;
     }
     
-    .menu-bar-title span { color: var(--accent); }
+    .title-tabs {
+      flex: 1;
+      display: flex;
+      margin-left: 20px;
+      -webkit-app-region: no-drag;
+    }
     
-    /* ========== TOOLBAR ========== */
+    .title-tab {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      background: var(--bg-2);
+      transition: all 0.1s;
+    }
+    
+    .title-tab:hover { background: var(--bg-3); color: var(--text); }
+    .title-tab.active { background: var(--bg-1); color: var(--text); }
+    
+    /* Toolbar */
     .toolbar {
-      background: var(--bg-header);
-      height: 38px;
+      height: 36px;
+      background: var(--bg-3);
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      border-bottom: 1px solid var(--border-color);
+      padding: 0 8px;
+      border-bottom: 1px solid var(--border);
       gap: 4px;
     }
     
@@ -93,10 +88,8 @@
       align-items: center;
       gap: 2px;
       padding: 0 8px;
-      border-right: 1px solid var(--border-color);
+      border-right: 1px solid var(--border);
     }
-    
-    .toolbar-group:last-child { border-right: none; }
     
     .toolbar-btn {
       width: 28px;
@@ -106,49 +99,59 @@
       justify-content: center;
       background: transparent;
       border: none;
-      color: var(--text-secondary);
+      color: var(--text-dim);
       cursor: pointer;
       border-radius: 3px;
       font-size: 14px;
     }
     
-    .toolbar-btn:hover { background: var(--selection); color: var(--text-primary); }
-    .toolbar-btn.active { background: var(--accent); color: white; }
-    .toolbar-btn.play { color: var(--success); }
-    .toolbar-btn.stop { color: var(--error); }
+    .toolbar-btn:hover { background: var(--bg-4); color: var(--text); }
+    .toolbar-btn.on { color: var(--green); }
     
-    .toolbar-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-left: 8px;
-    }
+    /* Main */
+    .main { display: flex; flex: 1; overflow: hidden; }
     
-    /* ========== MAIN LAYOUT ========== */
-    .main-area {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-    
-    /* ========== LEFT PANEL ========== */
-    .left-panel {
-      width: 280px;
-      min-width: 200px;
-      background: var(--bg-panel);
-      border-right: 1px solid var(--border-color);
+    /* Sidebar */
+    .sidebar {
+      width: 48px;
+      background: var(--bg-2);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      padding: 6px;
     }
     
-    .panel {
+    .side-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .side-btn:hover { background: var(--bg-3); color: var(--text); }
+    .side-btn.active { background: var(--accent); color: #fff; }
+    
+    /* Panel Left */
+    .panel-left {
+      width: 220px;
+      background: var(--bg-2);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      border-bottom: 1px solid var(--border-color);
     }
     
     .panel-header {
       height: 28px;
-      background: var(--bg-header);
+      background: var(--bg-3);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -157,186 +160,34 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-secondary);
-      cursor: pointer;
+      color: var(--text-dim);
     }
     
-    .panel-header:hover { background: #22222c; }
+    .panel-content { padding: 4px; overflow: auto; }
     
-    .panel-header-btn {
-      width: 18px;
-      height: 18px;
+    /* Explorer */
+    .explorer-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
+      padding: 4px 8px;
       cursor: pointer;
-      border-radius: 2px;
-    }
-    
-    .panel-header-btn:hover { background: var(--selection); color: var(--text-primary); }
-    
-    .panel-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px;
-    }
-    
-    /* Content Browser */
-    .content-browser {
-      height: 200px;
-    }
-    
-    .content-path {
-      display: flex;
-      align-items: center;
-      padding: 6px 8px;
-      background: var(--bg-darker);
-      border-bottom: 1px solid var(--border-color);
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
-    
-    .content-path-item {
-      padding: 2px 6px;
-      cursor: pointer;
-      border-radius: 2px;
-    }
-    
-    .content-path-item:hover { background: var(--selection); }
-    .content-path-item:last-child { color: var(--text-primary); }
-    
-    .content-path-sep { color: var(--text-muted); margin: 0 4px; }
-    
-    .asset-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      padding: 4px;
-    }
-    
-    .asset-item {
-      aspect-ratio: 1;
-      background: var(--bg-darker);
-      border: 1px solid transparent;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      transition: all 0.15s;
-    }
-    
-    .asset-item:hover {
-      border-color: var(--accent);
-      background: #1a1a25;
-    }
-    
-    .asset-item.selected {
-      border-color: var(--accent);
-      background: var(--selection);
-    }
-    
-    .asset-icon {
-      font-size: 24px;
-      margin-bottom: 4px;
-    }
-    
-    .asset-name {
-      font-size: 9px;
-      color: var(--text-secondary);
-      text-align: center;
-      word-break: break-word;
-    }
-    
-    /* World Outliner */
-    .outliner-tree {
-      padding: 4px 0;
-    }
-    
-    .outliner-item {
-      display: flex;
-      align-items: center;
-      padding: 3px 8px;
-      cursor: pointer;
-      border-radius: 2px;
       font-size: 12px;
+      color: var(--text-dim);
+      border-radius: 2px;
     }
     
-    .outliner-item:hover { background: #1e1e28; }
-    .outliner-item.selected { background: var(--selection); }
+    .explorer-item:hover { background: var(--bg-3); color: var(--text); }
+    .explorer-item.selected { background: rgba(99, 102, 241, 0.2); color: var(--text); }
     
-    .outliner-icon {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 6px;
-      color: var(--text-muted);
-    }
+    .explorer-icon { width: 16px; margin-right: 6px; color: var(--text-off); }
+    .explorer-arrow { width: 16px; color: var(--text-off); cursor: pointer; }
+    .explorer-indent { width: 16px; }
     
-    .outliner-expand {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-    
-    .outliner-expand:hover { color: var(--text-primary); }
-    
-    .outliner-indent {
-      width: 16px;
-      height: 16px;
-    }
-    
-    /* ========== MODES PANEL ========== */
-    .modes-panel {
-      width: 52px;
-      background: var(--bg-darker);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      padding: 8px 0;
-    }
-    
-    .mode-btn {
-      width: 40px;
-      height: 40px;
-      margin: 2px auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    
-    .mode-btn:hover { background: var(--selection); color: var(--text-primary); }
-    .mode-btn.active { background: var(--accent); color: white; }
-    
-    .mode-label {
-      font-size: 7px;
-      margin-top: 2px;
-    }
-    
-    /* ========== VIEWPORT ========== */
-    .viewport-container {
+    /* Viewport */
+    .viewport {
       flex: 1;
       position: relative;
-      background: #0a0a0e;
-      overflow: hidden;
+      background: var(--bg-1);
     }
     
     #viewport {
@@ -345,476 +196,363 @@
       display: block;
     }
     
-    .viewport-toolbar {
+    .viewport-overlay {
       position: absolute;
       top: 8px;
       left: 8px;
       display: flex;
-      gap: 4px;
+      gap: 2px;
     }
     
-    .viewport-toolbar-btn {
+    .view-btn {
       width: 24px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(20, 20, 26, 0.9);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
+      background: rgba(26, 26, 34, 0.9);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
       cursor: pointer;
-      border-radius: 3px;
-      font-size: 12px;
-    }
-    
-    .viewport-toolbar-btn:hover { background: #252530; }
-    .viewport-toolbar-btn.active { background: var(--accent); color: white; }
-    
-    .viewport-overlay {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 6px 10px;
-      border-radius: 4px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    
-    .viewport-cam {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 6px 10px;
-      border-radius: 4px;
       font-size: 10px;
-      color: var(--text-muted);
+      font-weight: 600;
     }
     
-    /* ========== RIGHT PANEL ========== */
-    .right-panel {
-      width: 300px;
-      min-width: 250px;
-      background: var(--bg-panel);
-      border-left: 1px solid var(--border-color);
+    .view-btn:hover { background: var(--bg-3); }
+    .view-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    
+    .viewport-info {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 10px;
+      color: var(--text-off);
+    }
+    
+    /* Panel Right */
+    .panel-right {
+      width: 260px;
+      background: var(--bg-2);
+      border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
     }
     
-    /* Details Panel */
-    .details-panel {
-      flex: 1;
-    }
+    .prop-section { border-bottom: 1px solid var(--border); }
     
-    .details-section {
-      border-bottom: 1px solid var(--border-color);
-    }
-    
-    .details-section-header {
-      height: 26px;
-      background: var(--bg-header);
+    .prop-header {
+      height: 24px;
+      background: var(--bg-3);
       display: flex;
       align-items: center;
       padding: 0 10px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
-      color: var(--text-secondary);
-      cursor: pointer;
+      color: var(--text-dim);
     }
     
-    .details-section-header:hover { background: #22222c; }
-    
-    .details-row {
+    .prop-row {
       display: flex;
       align-items: center;
-      padding: 4px 10px;
-      font-size: 12px;
+      padding: 5px 10px;
+      font-size: 11px;
     }
     
-    .details-label {
-      width: 90px;
-      color: var(--text-secondary);
+    .prop-label {
+      width: 70px;
+      color: var(--text-dim);
       flex-shrink: 0;
     }
     
-    .details-value {
+    .prop-input {
       flex: 1;
-      display: flex;
-      gap: 4px;
-    }
-    
-    .details-input {
-      flex: 1;
-      background: var(--bg-darker);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 3px 6px;
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 6px;
       font-size: 11px;
-      border-radius: 3px;
+      border-radius: 2px;
     }
     
-    .details-input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
+    .prop-input:focus { outline: none; border-color: var(--accent); }
     
-    /* ========== BOTTOM PANEL ========== */
+    .prop-group { display: flex; gap: 4px; }
+    .prop-group .prop-input { width: 33.33%; }
+    
+    /* Bottom */
     .bottom-panel {
-      height: 180px;
-      background: var(--bg-panel);
-      border-top: 1px solid var(--border-color);
+      height: 140px;
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
       display: flex;
       flex-direction: column;
     }
     
-    .bottom-panel-tabs {
+    .bottom-tabs {
       display: flex;
-      background: var(--bg-header);
-      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-3);
+      border-bottom: 1px solid var(--border);
     }
     
     .bottom-tab {
-      padding: 6px 16px;
+      padding: 5px 12px;
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-off);
       cursor: pointer;
       border-bottom: 2px solid transparent;
     }
     
-    .bottom-tab:hover { color: var(--text-secondary); }
-    .bottom-tab.active {
-      color: var(--text-primary);
-      border-bottom-color: var(--accent);
-    }
+    .bottom-tab:hover { color: var(--text-dim); }
+    .bottom-tab.active { color: var(--text); border-bottom-color: var(--accent); }
     
-    .bottom-panel-content {
+    .bottom-content {
       flex: 1;
       overflow: auto;
-      padding: 8px;
-      font-family: 'Consolas', 'Monaco', monospace;
+      padding: 6px 10px;
+      font-family: 'SF Mono', 'Consolas', monospace;
       font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.6;
+      color: var(--text-dim);
+      line-height: 1.5;
     }
     
-    .log-entry { margin: 2px 0; }
-    .log-entry.info { color: var(--text-secondary); }
-    .log-entry.warning { color: var(--warning); }
-    .log-entry.error { color: var(--error); }
-    .log-entry.success { color: var(--success); }
+    .log { margin: 1px 0; }
+    .log-warn { color: var(--yellow); }
+    .log-error { color: var(--red); }
+    .log-success { color: var(--green); }
     
-    /* ========== STATUS BAR ========== */
+    /* Status */
     .status-bar {
       height: 22px;
-      background: linear-gradient(180deg, #1a1a22 0%, #141419 100%);
-      border-top: 1px solid #000;
+      background: var(--bg-3);
+      border-top: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 10px;
+      padding: 0 12px;
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-off);
     }
     
-    .status-left, .status-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .status-left, .status-right { display: flex; align-items: center; gap: 12px; }
     
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--success);
+      background: var(--green);
     }
     
-    /* ========== SCROLLBAR ========== */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: var(--bg-darker);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #3a3a48;
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #4a4a58;
-    }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-1); }
+    ::-webkit-scrollbar-thumb { background: #3a3a48; border-radius: 3px; }
   </style>
 </head>
 <body>
   <div id="app">
-    <!-- Menu Bar -->
-    <div class="menu-bar">
-      <span class="menu-bar-title"><span>VOID</span> IDE</span>
-      <div class="menu-bar-item">File</div>
-      <div class="menu-bar-item">Edit</div>
-      <div class="menu-bar-item">View</div>
-      <div class="menu-bar-item">Window</div>
-      <div class="menu-bar-item">Help</div>
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <span class="title-logo">VOID IDE</span>
+      <div class="title-tabs">
+        <div class="title-tab active" data-panel="level">Level</div>
+        <div class="title-tab" data-panel="material">Material</div>
+        <div class="title-tab" data-panel="blueprint">Blueprint</div>
+        <div class="title-tab" data-panel="sequence">Sequence</div>
+        <div class="title-tab" data-panel="ui">UI</div>
+      </div>
     </div>
     
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="toolbar-group">
-        <button class="toolbar-btn" title="New Level">📄</button>
-        <button class="toolbar-btn" title="Open Level">📂</button>
-        <button class="toolbar-btn" title="Save">💾</button>
+        <button class="toolbar-btn" title="New">+</button>
+        <button class="toolbar-btn" title="Open">O</button>
+        <button class="toolbar-btn" title="Save">S</button>
       </div>
       <div class="toolbar-group">
-        <button class="toolbar-btn" title="Undo">↶</button>
-        <button class="toolbar-btn" title="Redo">↷</button>
+        <button class="toolbar-btn" title="Undo">U</button>
+        <button class="toolbar-btn" title="Redo">R</button>
       </div>
       <div class="toolbar-group">
-        <button class="toolbar-btn" title="Cut">✂</button>
-        <button class="toolbar-btn" title="Copy">📋</button>
-        <button class="toolbar-btn" title="Paste">📌</button>
-        <button class="toolbar-btn" title="Delete">🗑</button>
+        <button class="toolbar-btn" title="Cut">X</button>
+        <button class="toolbar-btn" title="Copy">C</button>
+        <button class="toolbar-btn" title="Paste">V</button>
+        <button class="toolbar-btn" title="Delete">D</button>
       </div>
-      <span class="toolbar-label">Current Level: Untitled</span>
       <div style="flex:1"></div>
       <div class="toolbar-group">
-        <button class="toolbar-btn play" title="Play">▶</button>
-        <button class="toolbar-btn" title="Pause">⏸</button>
-        <button class="toolbar-btn stop" title="Stop">⏹</button>
+        <button class="toolbar-btn on" title="Play">P</button>
+        <button class="toolbar-btn" title="Pause">II</button>
+        <button class="toolbar-btn" title="Stop">[]</button>
       </div>
     </div>
     
-    <!-- Main Area -->
-    <div class="main-area">
-      <!-- Left Panel -->
-      <div class="left-panel">
-        <!-- Content Browser -->
-        <div class="panel content-browser">
-          <div class="panel-header">
-            <span>Content Browser</span>
-            <button class="panel-header-btn" title="Add">+</button>
+    <!-- Main -->
+    <div class="main">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="side-btn active" data-mode="place">+</button>
+        <button class="side-btn" data-mode="select">S</button>
+        <button class="side-btn" data-mode="move">M</button>
+        <button class="side-btn" data-mode="rotate">R</button>
+        <button class="side-btn" data-mode="scale">Sc</button>
+      </div>
+      
+      <!-- Panel Left -->
+      <div class="panel-left">
+        <div class="panel-header">
+          <span>Explorer</span>
+          <span>+</span>
+        </div>
+        <div class="panel-content">
+          <div class="explorer-item">
+            <span class="explorer-arrow">></span>
+            <span class="explorer-icon">D</span>
+            <span>Content</span>
           </div>
-          <div class="content-path">
-            <span class="content-path-item">Game</span>
-            <span class="content-path-sep">/</span>
-            <span class="content-path-item">Content</span>
-            <span class="content-path-sep">/</span>
-            <span class="content-path-item">Levels</span>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">></span>
+            <span class="explorer-icon">L</span>
+            <span>Levels</span>
           </div>
-          <div class="asset-grid">
-            <div class="asset-item selected" data-type="level">
-              <div class="asset-icon">🗺</div>
-              <div class="asset-name">MainLevel</div>
+          <div class="explorer-item selected" style="padding-left: 40px;">
+            <span class="explorer-icon">_</span>
+            <span>MainLevel</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">v</span>
+            <span class="explorer-icon">M</span>
+            <span>Materials</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">v</span>
+            <span class="explorer-icon">B</span>
+            <span>Blueprints</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">v</span>
+            <span class="explorer-icon">T</span>
+            <span>Textures</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">v</span>
+            <span class="explorer-icon">_</span>
+            <span>Meshes</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 24px;">
+            <span class="explorer-arrow">v</span>
+            <span class="explorer-icon">S</span>
+            <span>Sounds</span>
+          </div>
+        </div>
+        
+        <div class="panel-header" style="margin-top: auto;">
+          <span>Outline</span>
+        </div>
+        <div class="panel-content">
+          <div class="explorer-item">
+            <span class="explorer-arrow">></span>
+            <span class="explorer-icon">L</span>
+            <span>MainLevel</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 20px;">
+            <span class="explorer-icon">D</span>
+            <span>DirectionalLight</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 20px;">
+            <span class="explorer-icon">C</span>
+            <span>Camera</span>
+          </div>
+          <div class="explorer-item selected" style="padding-left: 20px;">
+            <span class="explorer-icon">B</span>
+            <span>Cube_01</span>
+          </div>
+          <div class="explorer-item" style="padding-left: 20px;">
+            <span class="explorer-icon">P</span>
+            <span>Floor</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Viewport -->
+      <div class="viewport">
+        <canvas id="viewport"></canvas>
+        <div class="viewport-overlay">
+          <button class="view-btn active">P</button>
+          <button class="view-btn">T</button>
+          <button class="view-btn">F</button>
+          <button class="view-btn">R</button>
+        </div>
+        <div class="viewport-info">Perspective</div>
+      </div>
+      
+      <!-- Panel Right -->
+      <div class="panel-right">
+        <div class="panel-header" style="height: 28px;">
+          <span>Properties</span>
+        </div>
+        
+        <div class="prop-section">
+          <div class="prop-header">Transform</div>
+          <div class="prop-row">
+            <span class="prop-label">Position</span>
+            <div class="prop-group">
+              <input type="text" class="prop-input" value="0">
+              <input type="text" class="prop-input" value="0">
+              <input type="text" class="prop-input" value="0">
             </div>
-            <div class="asset-item" data-type="folder">
-              <div class="asset-icon">📁</div>
-              <div class="asset-name">Materials</div>
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Rotation</span>
+            <div class="prop-group">
+              <input type="text" class="prop-input" value="0">
+              <input type="text" class="prop-input" value="0">
+              <input type="text" class="prop-input" value="0">
             </div>
-            <div class="asset-item" data-type="folder">
-              <div class="asset-icon">📁</div>
-              <div class="asset-name">Blueprints</div>
-            </div>
-            <div class="asset-item" data-type="folder">
-              <div class="asset-icon">📁</div>
-              <div class="asset-name">Textures</div>
-            </div>
-            <div class="asset-item" data-type="folder">
-              <div class="asset-icon">📁</div>
-              <div class="asset-name">Meshes</div>
-            </div>
-            <div class="asset-item" data-type="folder">
-              <div class="asset-icon">📁</div>
-              <div class="asset-name">Sounds</div>
-            </div>
-            <div class="asset-item" data-type="material">
-              <div class="asset-icon">🎨</div>
-              <div class="asset-name">M_Basic</div>
-            </div>
-            <div class="asset-item" data-type="blueprint">
-              <div class="asset-icon">📘</div>
-              <div class="asset-name">BP_Player</div>
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Scale</span>
+            <div class="prop-group">
+              <input type="text" class="prop-input" value="1">
+              <input type="text" class="prop-input" value="1">
+              <input type="text" class="prop-input" value="1">
             </div>
           </div>
         </div>
         
-        <!-- World Outliner -->
-        <div class="panel" style="flex:1">
-          <div class="panel-header">
-            <span>World Outliner</span>
-            <button class="panel-header-btn" title="Search">🔍</button>
+        <div class="prop-section">
+          <div class="prop-header">Actor</div>
+          <div class="prop-row">
+            <span class="prop-label">Name</span>
+            <input type="text" class="prop-input" value="Cube_01">
           </div>
-          <div class="panel-content outliner-tree">
-            <div class="outliner-item selected">
-              <span class="outliner-expand">▶</span>
-              <span class="outliner-icon">🗺</span>
-              <span>MainLevel</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 24px;">
-              <span class="outliner-icon">☀</span>
-              <span>DirectionalLight</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 24px;">
-              <span class="outliner-icon">📷</span>
-              <span>CameraActor</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 24px;">
-              <span class="outliner-icon">☁</span>
-              <span>SkySphere</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 24px;">
-              <span class="outliner-expand">▶</span>
-              <span class="outliner-icon">📦</span>
-              <span>Cube_01</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 40px;">
-              <span class="outliner-icon">🔲</span>
-              <span>StaticMesh</span>
-            </div>
-            <div class="outliner-item" style="padding-left: 24px;">
-              <span class="outliner-icon">🔲</span>
-              <span>Floor</span>
-            </div>
+          <div class="prop-row">
+            <span class="prop-label">Type</span>
+            <input type="text" class="prop-input" value="StaticMesh" readonly>
           </div>
         </div>
-      </div>
-      
-      <!-- Modes Panel -->
-      <div class="modes-panel">
-        <button class="mode-btn active" title="Place">
-          ➕
-          <span class="mode-label">Place</span>
-        </button>
-        <button class="mode-btn" title="Paint">
-          🖌
-          <span class="mode-label">Paint</span>
-        </button>
-        <button class="mode-btn" title="Landscape">
-          🏔
-          <span class="mode-label">Landscape</span>
-        </button>
-        <button class="mode-btn" title="Foliage">
-          🌲
-          <span class="mode-label">Foliage</span>
-        </button>
-        <button class="mode-btn" title="Geometry">
-          📐
-          <span class="mode-label">Geometry</span>
-        </button>
-        <button class="mode-btn" title="Brush">
-          🖼
-          <span class="mode-label">Brush</span>
-        </button>
-      </div>
-      
-      <!-- Viewport -->
-      <div class="viewport-container">
-        <canvas id="viewport"></canvas>
-        <div class="viewport-toolbar">
-          <button class="viewport-toolbar-btn active" title="Perspective">👁</button>
-          <button class="viewport-toolbar-btn" title="Top">⬆</button>
-          <button class="viewport-toolbar-btn" title="Front">➡</button>
-          <button class="viewport-toolbar-btn" title="Right">⬇</button>
+        
+        <div class="prop-section">
+          <div class="prop-header">Mesh</div>
+          <div class="prop-row">
+            <span class="prop-label">Static</span>
+            <input type="text" class="prop-input" value="SM_Cube">
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Material</span>
+            <input type="text" class="prop-input" value="M_Base">
+          </div>
         </div>
-        <div class="viewport-overlay">Perspective</div>
-        <div class="viewport-cam">Camera: Perspective</div>
-      </div>
-      
-      <!-- Right Panel -->
-      <div class="right-panel">
-        <div class="panel details-panel">
-          <div class="panel-header">
-            <span>Details</span>
-            <button class="panel-header-btn" title="Lock">🔒</button>
+        
+        <div class="prop-section">
+          <div class="prop-header">Physics</div>
+          <div class="prop-row">
+            <span class="prop-label">Simulate</span>
+            <input type="checkbox" checked>
           </div>
-          
-          <div class="details-section">
-            <div class="details-section-header">Transform</div>
-            <div class="details-row">
-              <span class="details-label">Location</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="0">
-                <input type="text" class="details-input" value="0">
-                <input type="text" class="details-input" value="0">
-              </div>
-            </div>
-            <div class="details-row">
-              <span class="details-label">Rotation</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="0">
-                <input type="text" class="details-input" value="0">
-                <input type="text" class="details-input" value="0">
-              </div>
-            </div>
-            <div class="details-row">
-              <span class="details-label">Scale</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="1">
-                <input type="text" class="details-input" value="1">
-                <input type="text" class="details-input" value="1">
-              </div>
-            </div>
-          </div>
-          
-          <div class="details-section">
-            <div class="details-section-header">Actor</div>
-            <div class="details-row">
-              <span class="details-label">Label</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="Cube_01">
-              </div>
-            </div>
-            <div class="details-row">
-              <span class="details-label">Static Mesh</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="SM_Cube">
-              </div>
-            </div>
-          </div>
-          
-          <div class="details-section">
-            <div class="details-section-header">Materials</div>
-            <div class="details-row">
-              <span class="details-label">Material</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="M_Basic">
-              </div>
-            </div>
-          </div>
-          
-          <div class="details-section">
-            <div class="details-section-header">Physics</div>
-            <div class="details-row">
-              <span class="details-label">Simulate</span>
-              <div class="details-value">
-                <input type="checkbox" checked> Enabled
-              </div>
-            </div>
-            <div class="details-row">
-              <span class="details-label">Mass (kg)</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="100">
-              </div>
-            </div>
-          </div>
-          
-          <div class="details-section">
-            <div class="details-section-header">Collision</div>
-            <div class="details-row">
-              <span class="details-label">Presets</span>
-              <div class="details-value">
-                <input type="text" class="details-input" value="BlockAll">
-              </div>
-            </div>
+          <div class="prop-row">
+            <span class="prop-label">Mass</span>
+            <input type="text" class="prop-input" value="100">
           </div>
         </div>
       </div>
@@ -822,43 +560,38 @@
     
     <!-- Bottom Panel -->
     <div class="bottom-panel">
-      <div class="bottom-panel-tabs">
-        <div class="bottom-tab active">Output Log</div>
+      <div class="bottom-tabs">
+        <div class="bottom-tab active">Output</div>
         <div class="bottom-tab">Console</div>
-        <div class="bottom-tab">Debug</div>
-        <div class="bottom-tab">Blueprint</div>
+        <div class="bottom-tab">Problems</div>
+        <div class="bottom-tab">Terminal</div>
       </div>
-      <div class="bottom-panel-content">
-        <div class="log-entry info">[2026.03.01-19.23.01:000] LogInit: VOID IDE - Unreal-Class Engine</div>
-        <div class="log-entry info">[2026.03.01-19.23.01:001] LogRenderer: Initialized viewport</div>
-        <div class="log-entry info">[2026.03.01-19.23.01:002] LogContentBrowser: Content path: Game/Content</div>
-        <div class="log-entry info">[2026.03.01-19.23.01:003] LogWorld: Level loaded: MainLevel</div>
-        <div class="log-entry success">[2026.03.01-19.23.01:004] LogInit: Engine ready</div>
-        <div class="log-entry info">[2026.03.01-19.23.01:005] LogTaskGraph: Initialized</div>
+      <div class="bottom-content" id="console">
+        <div class="log">[12:00:00] VOID IDE initialized</div>
+        <div class="log">[12:00:01] Loading Three.js...</div>
+        <div class="log-success">[12:00:02] WebGL renderer ready</div>
+        <div class="log">[12:00:02] Loading level...</div>
+        <div class="log-success">[12:00:03] MainLevel loaded</div>
+        <div class="log">[12:00:03] Ready</div>
       </div>
     </div>
     
-    <!-- Status Bar -->
+    <!-- Status -->
     <div class="status-bar">
       <div class="status-left">
-        <div class="status-item">
-          <span class="status-dot"></span>
-          <span>Ready</span>
-        </div>
-        <div class="status-item">|</div>
-        <div class="status-item">立方体 Selected</div>
+        <span style="display:flex;align-items:center;gap:6px"><span class="status-dot"></span>Ready</span>
+        <span>|</span>
+        <span>Cube_01</span>
       </div>
       <div class="status-right">
-        <div class="status-item">Viewport: 1920x1080</div>
-        <div class="status-item">FPS: 60</div>
-        <div class="status-item">Draw Calls: 12</div>
-        <div class="status-item">Tris: 2.4k</div>
+        <span>1920x1080</span>
+        <span id="fps">60 FPS</span>
+        <span>12 draw</span>
       </div>
     </div>
   </div>
   
   <script src="lib/three.min.js"></script>
-  <script src="lib/cannon-es.js"></script>
-  <script src="renderer-unreal.js"></script>
+  <script src="renderer-pro.js"></script>
 </body>
 </html>

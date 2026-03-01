@@ -30,8 +30,13 @@ const buildWeb = async () => {
 
   // Copy JS files
   fs.copyFileSync(
-    path.join(srcDir, 'renderer.js'),
-    path.join(outputDir, 'renderer.js')
+    path.join(srcDir, 'renderer-pro.js'),
+    path.join(outputDir, 'renderer-pro.js')
+  );
+
+  fs.copyFileSync(
+    path.join(srcDir, 'renderer-unreal.js'),
+    path.join(outputDir, 'renderer-unreal.js')
   );
 
   fs.copyFileSync(

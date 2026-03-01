@@ -4,6 +4,16 @@ console.log('VOID IDE Unreal Renderer initializing...');
 let scene, camera, renderer, controls;
 let selectedObject = null;
 let objects = [];
+let currentEditor = 'level';
+
+// Editor panels - hide/show based on mode
+const editorPanels = {
+  level: null,      // Main level editor - shows viewport
+  material: null,   // Material editor panel
+  blueprint: null,  // Blueprint editor panel  
+  sequencer: null, // Sequencer timeline
+  landscape: null  // Landscape editor
+};
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Three.js version:', THREE.VERSION);
   
   initViewport();
+  setupEditorTabs();
   setupEventListeners();
   log('VOID IDE initialized successfully', 'success');
 });
@@ -30,8 +41,8 @@ function initViewport() {
   
   // Scene
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a0e);
-  scene.fog = new THREE.Fog(0x0a0a0e, 50, 500);
+  scene.background = new THREE.Color(0x1a1a2e);
+  scene.fog = new THREE.Fog(0x1a1a2e, 50, 500);
   
   // Camera
   const container = canvas.parentElement;
@@ -77,12 +88,12 @@ function initViewport() {
 }
 
 function setupLighting() {
-  // Ambient light
-  const ambient = new THREE.AmbientLight(0x404050, 0.5);
+  // Ambient light - brighter
+  const ambient = new THREE.AmbientLight(0x606080, 0.8);
   scene.add(ambient);
   
-  // Directional light (sun)
-  const directional = new THREE.DirectionalLight(0xffffff, 1.5);
+  // Directional light (sun) - brighter
+  const directional = new THREE.DirectionalLight(0xffffff, 2);
   directional.position.set(50, 100, 50);
   directional.castShadow = true;
   directional.shadow.mapSize.width = 2048;
@@ -96,17 +107,17 @@ function setupLighting() {
   scene.add(directional);
   
   // Hemisphere light for better ambient
-  const hemi = new THREE.HemisphereLight(0x606080, 0x404040, 0.5);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x606060, 0.8);
   scene.add(hemi);
 }
 
 function createEnvironment() {
-  // Ground plane
+  // Ground plane - lighter gray
   const groundGeo = new THREE.PlaneGeometry(500, 500);
   const groundMat = new THREE.MeshStandardMaterial({ 
-    color: 0x1a1a1f,
-    roughness: 0.9,
-    metalness: 0.1
+    color: 0x2a2a35,
+    roughness: 0.8,
+    metalness: 0.2
   });
   const ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI / 2;
@@ -115,15 +126,15 @@ function createEnvironment() {
   scene.add(ground);
   objects.push(ground);
   
-  // Grid helper
-  const grid = new THREE.GridHelper(200, 100, 0x333340, 0x222230);
+  // Grid helper - brighter
+  const grid = new THREE.GridHelper(200, 100, 0x444455, 0x333344);
   grid.position.y = 0.01;
   scene.add(grid);
   
   // Sky sphere
   const skyGeo = new THREE.SphereGeometry(400, 32, 32);
   const skyMat = new THREE.MeshBasicMaterial({
-    color: 0x0a0a14,
+    color: 0x1a1a2e,
     side: THREE.BackSide
   });
   const sky = new THREE.Mesh(skyGeo, skyMat);
@@ -131,12 +142,14 @@ function createEnvironment() {
 }
 
 function createDemoObjects() {
-  // Cube
+  // Cube - bright blue
   const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
   const cubeMat = new THREE.MeshStandardMaterial({ 
-    color: 0x0078ff,
-    roughness: 0.5,
-    metalness: 0.3
+    color: 0x00aaff,
+    roughness: 0.3,
+    metalness: 0.5,
+    emissive: 0x002244,
+    emissiveIntensity: 0.3
   });
   const cube = new THREE.Mesh(cubeGeo, cubeMat);
   cube.position.set(0, 1, 0);
@@ -147,12 +160,14 @@ function createDemoObjects() {
   scene.add(cube);
   objects.push(cube);
   
-  // Sphere
+  // Sphere - bright green
   const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
   const sphereMat = new THREE.MeshStandardMaterial({ 
-    color: 0x2ecc71,
-    roughness: 0.3,
-    metalness: 0.7
+    color: 0x00ff88,
+    roughness: 0.2,
+    metalness: 0.8,
+    emissive: 0x002211,
+    emissiveIntensity: 0.3
   });
   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
   sphere.position.set(5, 1, 0);
@@ -163,12 +178,14 @@ function createDemoObjects() {
   scene.add(sphere);
   objects.push(sphere);
   
-  // Cylinder
+  // Cylinder - bright red
   const cylGeo = new THREE.CylinderGeometry(0.8, 0.8, 3, 32);
   const cylMat = new THREE.MeshStandardMaterial({ 
-    color: 0xe74c3c,
-    roughness: 0.4,
-    metalness: 0.6
+    color: 0xff4466,
+    roughness: 0.2,
+    metalness: 0.8,
+    emissive: 0x220011,
+    emissiveIntensity: 0.3
   });
   const cylinder = new THREE.Mesh(cylGeo, cylMat);
   cylinder.position.set(-5, 1.5, 0);
@@ -179,12 +196,14 @@ function createDemoObjects() {
   scene.add(cylinder);
   objects.push(cylinder);
   
-  // Cone
+  // Cone - bright yellow
   const coneGeo = new THREE.ConeGeometry(1.5, 3, 32);
   const coneMat = new THREE.MeshStandardMaterial({ 
-    color: 0xf39c12,
-    roughness: 0.4,
-    metalness: 0.5
+    color: 0xffaa00,
+    roughness: 0.2,
+    metalness: 0.7,
+    emissive: 0x221100,
+    emissiveIntensity: 0.3
   });
   const cone = new THREE.Mesh(coneGeo, coneMat);
   cone.position.set(0, 1.5, 5);
@@ -195,12 +214,14 @@ function createDemoObjects() {
   scene.add(cone);
   objects.push(cone);
   
-  // Torus
+  // Torus - purple
   const torusGeo = new THREE.TorusGeometry(1, 0.4, 16, 48);
   const torusMat = new THREE.MeshStandardMaterial({ 
-    color: 0x9b59b6,
-    roughness: 0.3,
-    metalness: 0.7
+    color: 0xaa44ff,
+    roughness: 0.2,
+    metalness: 0.8,
+    emissive: 0x110022,
+    emissiveIntensity: 0.3
   });
   const torus = new THREE.Mesh(torusGeo, torusMat);
   torus.position.set(-5, 1.2, 5);
@@ -387,7 +408,42 @@ window.voidIDE = {
   addObject: (type) => {
     log(`Adding ${type}...`);
   },
-  log
+  log,
+  switchEditor
 };
+
+function switchEditor(editor) {
+  currentEditor = editor;
+  log(`Switching to ${editor} editor...`, 'info');
+  
+  // Update menu bar active state
+  document.querySelectorAll('.menu-bar-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.textContent.toLowerCase() === editor) {
+      item.classList.add('active');
+    }
+  });
+  
+  // Show/hide panels based on editor mode
+  const viewport = document.querySelector('.viewport-container');
+  const leftPanel = document.querySelector('.left-panel');
+  const rightPanel = document.querySelector('.right-panel');
+  const bottomPanel = document.querySelector('.bottom-panel');
+  
+  // For now, just update status to show which editor is active
+  const statusText = document.querySelector('.status-left .status-item:nth-child(3)');
+  if (statusText) {
+    const editorNames = {
+      level: 'Level Editor',
+      material: 'Material Editor',
+      blueprint: 'Blueprint Editor',
+      sequencer: 'Sequencer',
+      landscape: 'Landscape'
+    };
+    statusText.textContent = `${editorNames[editor]} Active`;
+  }
+  
+  log(`Editor: ${editor} mode`, 'success');
+}
 
 console.log('VOID IDE Unreal Renderer loaded');
