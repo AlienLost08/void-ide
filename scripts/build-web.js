@@ -45,6 +45,20 @@ const buildWeb = async () => {
     path.join(outputDir, 'void-ide.css')
   );
   
+  // Copy Three.js and Cannon.js libraries
+  const libDir = path.join(srcDir, 'lib');
+  const outputLibDir = path.join(outputDir, 'lib');
+  if (!fs.existsSync(outputLibDir)) {
+    fs.mkdirSync(outputLibDir, { recursive: true });
+  }
+  if (fs.existsSync(path.join(libDir, 'three.min.js'))) {
+    fs.copyFileSync(path.join(libDir, 'three.min.js'), path.join(outputLibDir, 'three.min.js'));
+  }
+  if (fs.existsSync(path.join(libDir, 'cannon-es.js'))) {
+    fs.copyFileSync(path.join(libDir, 'cannon-es.js'), path.join(outputLibDir, 'cannon-es.js'));
+  }
+  console.log('✅ Copied lib files');
+  
   // Create standalone game runner HTML
   const gameRunner = `<!DOCTYPE html>
 <html>
