@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:;">
+  <title>VOID IDE - Blueprint Editor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-dark: #0d0d12;
+      --bg-darker: #08080c;
+      --bg-panel: #141419;
+      --bg-header: #1a1a22;
+      --border-color: #2a2a35;
+      --accent: #0078ff;
+      --accent-blue: #0078ff;
+      --accent-green: #2ecc71;
+      --accent-orange: #f39c12;
+      --accent-red: #e74c3c;
+      --accent-purple: #9b59b6;
+      --text-primary: #e8e8ec;
+      --text-secondary: #9a9aa8;
+      --text-muted: #5c5c6e;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+      background: var(--bg-darker);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+    }
+    
+    .editor-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    /* Toolbar */
+    .toolbar {
+      background: linear-gradient(180deg, #1f1f28 0%, #18181f 100%);
+      height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border-color);
+      gap: 6px;
+    }
+    
+    .toolbar-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toolbar-title .icon {
+      width: 24px;
+      height: 24px;
+      background: var(--accent-blue);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .toolbar-btn {
+      padding: 5px 10px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    
+    .toolbar-btn:hover {
+      background: rgba(0, 120, 255, 0.15);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+    
+    .toolbar-btn.green { border-color: var(--accent-green); color: var(--accent-green); }
+    .toolbar-btn.green:hover { background: rgba(46, 204, 113, 0.15); }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border-color);
+      margin: 0 8px;
+    }
+    
+    .search-box {
+      background: var(--bg-darker);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      padding: 4px 10px;
+      color: var(--text-primary);
+      font-size: 12px;
+      width: 200px;
+      margin-left: auto;
+    }
+    
+    /* Tab Bar */
+    .tab-bar {
+      background: var(--bg-header);
+      height: 32px;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .tab {
+      padding: 6px 16px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 2px;
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tab:hover { background: #1a1a24; }
+    .tab.active {
+      background: #0a0a0f;
+      color: var(--text-primary);
+    }
+    
+    .tab-icon { font-size: 14px; }
+    .tab-close {: 0; opacity font-size: 10px; }
+    .tab:hover .tab-close { opacity: 1; }
+    
+    /* Main Area */
+    .main-area {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    /* Panel */
+    .panel {
+      background: var(--bg-panel);
+      border-right: 1px solid var(-- }
+    
+    .border-color);
+    backgroundpanel-header {
+     : var(--bg-header);
+      padding: 8px      font-size: 11px;
+ 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* My Blueprint Panel */
+    .my-blueprint {
+      width: 220px;
+    }
+    
+    .bp-section {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .bp-section-title {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .bp-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .bp-item:hover { background: rgba(255,255,255,0.05); }
+    .bp-item.active { background: rgba(0, 120, 255, 0.2); color: var(--text-primary); }
+    
+    .bp-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    /* Palette Panel */
+    .palette {
+      width: 240px;
+    }
+    
+    .palette-search {
+      padding: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .palette-search input {
+      width: 100%;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      padding: 5px 8px;
+      color: var(--text-primary);
+      font-size: 11px;
+    }
+    
+    .palette-category {
+      padding: 8px 12px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      background: var(--bg-darker);
+      cursor: pointer;
+    }
+    
+    .palette-category:hover { background: rgba(255,255,255,0.03); }
+    
+    .palette-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px 6px 20px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: grab;
+    }
+    
+    .palette-item:hover { background: rgba(0, 120, 255, 0.1); }
+    
+    .palette-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+    }
+    
+    /* Blueprint Canvas */
+    .bp-canvas {
+      flex: 1;
+      background: #0a0a0f;
+      position: relative;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle, #1a1a24 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    
+    /* Nodes */
+    .bp-node {
+      position: absolute;
+      min-width: 180px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    
+    .bp-node.selected { border-color: var(--accent-blue); }
+    
+    .bp-node-header {
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .bp-node.event { background: linear-gradient(90deg, #2a2a1a 0%, #1a1a12 100%); }
+    .bp-node.function { background: linear-gradient(90deg, #1a2a2a 0%, #121a1a 100%); }
+    .bp-node.variable { background: linear-gradient(90deg, #2a1a2a 0%, #1a121a 100%); }
+    .bp-node.math { background: linear-gradient(90deg, #1a1a2a 0%, #12121a 100%); }
+    
+    .bp-node-body {
+      padding: 8px 0;
+    }
+    
+    .bp-node-pins {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+    
+    .bp-pin {
+      display: flex;
+      align-items: center;
+      padding: 4px 12px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    
+    .bp-pin:hover { background: rgba(255,255,255,0.05); }
+    
+    .bp-pin-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .bp-pin.exec { background: var(--text-primary); }
+    .bp-pin.blue { background: var(--accent-blue); }
+    .bp-pin.green { background: var(--accent-green); }
+    .bp-pin.red { background: var(--accent-red); }
+    .bp-pin.orange { background: var(--accent-orange); }
+    .bp-pin.purple { background: var(--accent-purple); }
+    
+    .bp-pin.input .bp-pin-dot { margin-right: 8px; margin-left: -4px; }
+    .bp-pin.output .bp-pin-dot { margin-left: 8px; margin-right: -4px; }
+    
+    /* Details Panel */
+    .details {
+      width: 280px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+    }
+    
+    .details-section {
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .details-header {
+      background: var(--bg-header);
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .details-row {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    .details-label {
+      width: 80px;
+      color: var(--text-muted);
+    }
+    
+    .details-value {
+      flex: 1;
+    }
+    
+    .details-input {
+      width: 100%;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      padding: 4px 8px;
+      color: var(--text-primary);
+      font-size: 11px;
+    }
+    
+    /* Status Bar */
+    .status-bar {
+      height: 24px;
+      background: var(--bg-header);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      gap: 20px;
+    }
+    
+    .status-item.success { color: var(--accent-green); }
+    .status-item.error { color: var(--accent-red); }
+  </style>
+</head>
+<body>
+  <div class="editor-container">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-title">
+        <span class="icon">BP</span>
+        <span>BP_Player - Event Graph</span>
+      </div>
+      <button class="toolbar-btn green">▶ Compile</button>
+      <div class="toolbar-divider"></div>
+      <button class="toolbar-btn">📋 Copy</button>
+      <button class="toolbar-btn">📌 Paste</button>
+      <button class="toolbar-btn">🔄 Delete</button>
+      <div class="toolbar-divider"></div>
+      <button class="toolbar-btn">🔍 Find</button>
+      <button class="toolbar-btn">📊 Compact</button>
+      <input type="text" class="search-box" placeholder="Search nodes...">
+    </div>
+    
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab active">
+        <span class="tab-icon">📋</span>
+        <span>Event Graph</span>
+        <span class="tab-close">✕</span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon">⚡</span>
+        <span>Construction Script</span>
+        <span class="tab-close">✕</span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon">▶</span>
+        <span>Event Driven</span>
+        <span class="tab-close">✕</span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon">📝</span>
+        <span>Class Defaults</span>
+        <span class="tab-close">✕</span>
+      </div>
+    </div>
+    
+    <!-- Main Area -->
+    <div class="main-area">
+      <!-- My Blueprint -->
+      <div class="panel my-blueprint">
+        <div class="panel-header">My Blueprint</div>
+        
+        <div class="bp-section">
+          <div class="bp-section-title">Components</div>
+          <div class="bp-item active">
+            <span class="bp-icon" style="color: var(--accent-blue)">◇</span>
+            <span>Self</span>
+          </div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-green)">■</span>
+            <span>Mesh</span>
+          </div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-orange)">●</span>
+            <span>SpringArm</span>
+          </div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-purple)">◎</span>
+            <span>Camera</span>
+          </div>
+        </div>
+        
+        <div class="bp-section">
+          <div class="bp-section-title">Interfaces</div>
+          <div class="bp-item">
+            <span class="bp-icon">🔌</span>
+            <span>DamageInterface</span>
+          </div>
+        </div>
+        
+        <div class="bp-section">
+          <div class="bp-section-title">Variables</div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-green)">V</span>
+            <span>Health</span>
+          </div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-orange)">V</span>
+            <span>Speed</span>
+          </div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-blue)">V</span>
+            <span>IsDead</span>
+          </div>
+        </div>
+        
+        <div class="bp-section">
+          <div class="bp-section-title">Timelines</div>
+          <div class="bp-item">
+            <span class="bp-icon" style="color: var(--accent-purple)">⌐</span>
+            <span>JumpTimeline</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Palette -->
+      <div class="panel palette">
+        <div class="panel-header">Palette</div>
+        
+        <div class="palette-search">
+          <input type="text" placeholder="Search nodes...">
+        </div>
+        
+        <div class="palette-category">▶ Actions</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> Branch</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> Sequence</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> Gate</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> MultiGate</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> DoOnce</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> ForEachLoop</div>
+        
+        <div class="palette-category">▶ Gameplay</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-green)">G</span> GetPlayerController</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-green)">G</span> GetGameMode</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-green)">G</span> GetActorLocation</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-green)">S</span> SetActorLocation</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-orange)">P</span> PrintString</div>
+        
+        <div class="palette-category">▶ Math</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">+</span> Add</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">-</span> Subtract</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">×</span> Multiply</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">÷</span> Divide</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">%</span> Modulo</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-red)">=</span> Equal</div>
+        
+        <div class="palette-category">▶ Movement</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-purple)">↑</span> AddMovementInput</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-purple)">↕</span> AddControllerPitch</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-purple)">↔</span> AddControllerYaw</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-purple)">◎</span> GetControlRotation</div>
+        
+        <div class="palette-category">▶ Animation</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">▶</span> PlayAnim</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">⏹</span> StopAnim</div>
+        <div class="palette-item"><span class="palette-icon" style="background: var(--accent-blue)">⏸</span> MontagePlay</div>
+      </div>
+      
+      <!-- Blueprint Canvas -->
+      <div class="bp-canvas" id="canvas">
+        <!-- Event Node -->
+        <div class="bp-node event" style="left: 50px; top: 50px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-orange)">⚡</span>
+            Event Tick
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div></div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot exec"></span>
+                Then
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Branch Node -->
+        <div class="bp-node function" style="left: 280px; top: 50px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-blue)">◇</span>
+            Branch
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot exec"></span>
+                In
+              </div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot exec"></span>
+                True
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div></div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot exec"></span>
+                False
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot blue"></span>
+                Condition
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Print String Node -->
+        <div class="bp-node function" style="left: 520px; top: 20px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-orange)">P</span>
+            Print String
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot exec"></span>
+                In
+              </div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot exec"></span>
+                Out
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot red"></span>
+                In String
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Add Movement Input -->
+        <div class="bp-node function" style="left: 520px; top: 180px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-purple)">↑</span>
+            Add Movement Input
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot exec"></span>
+                In
+              </div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot exec"></span>
+                Out
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot green"></span>
+                World Direction
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot orange"></span>
+                Scale Value
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Variable Get Node -->
+        <div class="bp-node variable" style="left: 50px; top: 200px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-green)">V</span>
+            Health
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div></div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot green"></span>
+                Return Value
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Compare Node -->
+        <div class="bp-node math" style="left: 280px; top: 220px;">
+          <div class="bp-node-header">
+            <span style="color: var(--accent-red)">=</span>
+            > (Greater)
+          </div>
+          <div class="bp-node-body">
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot red"></span>
+                A
+              </div>
+              <div class="bp-pin output">
+                <span class="bp-pin-dot orange"></span>
+                Return Value
+              </div>
+            </div>
+            <div class="bp-node-pins">
+              <div class="bp-pin input">
+                <span class="bp-pin-dot red"></span>
+                B
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Details Panel -->
+      <div class="panel details">
+        <div class="panel-header">Details</div>
+        
+        <div class="details-section">
+          <div class="details-header">Selected: Branch</div>
+          <div class="details-row">
+            <span class="details-label">Comment</span>
+            <div class="details-value">
+              <input type="text" class="details-input" placeholder="Add comment...">
+            </div>
+          </div>
+        </div>
+        
+        <div class="details-section">
+          <div class="details-header">Pins</div>
+          <div class="details-row">
+            <span class="details-label">In</span>
+            <div class="details-value" style="color: var(--text-primary)">Exec</div>
+          </div>
+          <div class="details-row">
+            <span class="details-label">True</span>
+            <div class="details-value" style="color: var(--text-primary)">Exec</div>
+          </div>
+          <div class="details-row">
+            <span class="details-label">False</span>
+            <div class="details-value" style="color: var(--text-primary)">Exec</div>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Condition</span>
+            <div class="details-value" style="color: var(--accent-blue)">Boolean</div>
+          </div>
+        </div>
+        
+        <div class="details-section">
+          <div class="details-header">Node</div>
+          <div class="details-row">
+            <span class="details-label">Tooltip</span>
+            <div class="details-value">
+              <input type="text" class="details-input" value="Route execution flow based on a boolean condition">
+            </div>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Cache</span>
+            <div class="details-value">
+              <input type="checkbox" checked> Enable Cache
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-item success">✓ Compilation Successful</span>
+      <span>6 Nodes</span>
+      <span>0 Warnings</span>
+      <span>0 Errors</span>
+      <span style="margin-left: auto;">Last Compiled: Just now</span>
+    </div>
+  </div>
+</body>
+</html>
