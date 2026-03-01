@@ -4,245 +4,861 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:;">
-  <title>VOID IDE - AI Game Engine</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>VOID IDE - Unreal-Class Game Engine</title>
+  <link rel="stylesheet" href="void-ide.css">
+  <style>
+    /* UNREAL ENGINE EDITOR LAYOUT */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-dark: #0d0d12;
+      --bg-darker: #08080c;
+      --bg-panel: #141419;
+      --bg-header: #1a1a22;
+      --border-color: #2a2a35;
+      --accent: #0078ff;
+      --accent-hover: #1a9fff;
+      --text-primary: #e8e8ec;
+      --text-secondary: #9a9aa8;
+      --text-muted: #5c5c6e;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --error: #e74c3c;
+      --selection: #0078ff40;
+    }
+    
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      background: var(--bg-darker);
+      color: var(--text-primary);
+    }
+    
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    /* ========== MENU BAR ========== */
+    .menu-bar {
+      background: linear-gradient(180deg, #1f1f28 0%, #18181f 100%);
+      height: 29px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border-bottom: 1px solid #000;
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+    
+    .menu-bar-item {
+      padding: 4px 10px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+    
+    .menu-bar-item:hover {
+      background: var(--selection);
+      color: var(--text-primary);
+    }
+    
+    .menu-bar-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      margin-right: 20px;
+      letter-spacing: 0.5px;
+    }
+    
+    .menu-bar-title span { color: var(--accent); }
+    
+    /* ========== TOOLBAR ========== */
+    .toolbar {
+      background: var(--bg-header);
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border-color);
+      gap: 4px;
+    }
+    
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 8px;
+      border-right: 1px solid var(--border-color);
+    }
+    
+    .toolbar-group:last-child { border-right: none; }
+    
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    
+    .toolbar-btn:hover { background: var(--selection); color: var(--text-primary); }
+    .toolbar-btn.active { background: var(--accent); color: white; }
+    .toolbar-btn.play { color: var(--success); }
+    .toolbar-btn.stop { color: var(--error); }
+    
+    .toolbar-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+    
+    /* ========== MAIN LAYOUT ========== */
+    .main-area {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    /* ========== LEFT PANEL ========== */
+    .left-panel {
+      width: 280px;
+      min-width: 200px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .panel-header {
+      height: 28px;
+      background: var(--bg-header);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    
+    .panel-header:hover { background: #22222c; }
+    
+    .panel-header-btn {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    
+    .panel-header-btn:hover { background: var(--selection); color: var(--text-primary); }
+    
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    
+    /* Content Browser */
+    .content-browser {
+      height: 200px;
+    }
+    
+    .content-path {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      background: var(--bg-darker);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    .content-path-item {
+      padding: 2px 6px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    
+    .content-path-item:hover { background: var(--selection); }
+    .content-path-item:last-child { color: var(--text-primary); }
+    
+    .content-path-sep { color: var(--text-muted); margin: 0 4px; }
+    
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 4px;
+    }
+    
+    .asset-item {
+      aspect-ratio: 1;
+      background: var(--bg-darker);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      transition: all 0.15s;
+    }
+    
+    .asset-item:hover {
+      border-color: var(--accent);
+      background: #1a1a25;
+    }
+    
+    .asset-item.selected {
+      border-color: var(--accent);
+      background: var(--selection);
+    }
+    
+    .asset-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .asset-name {
+      font-size: 9px;
+      color: var(--text-secondary);
+      text-align: center;
+      word-break: break-word;
+    }
+    
+    /* World Outliner */
+    .outliner-tree {
+      padding: 4px 0;
+    }
+    
+    .outliner-item {
+      display: flex;
+      align-items: center;
+      padding: 3px 8px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+    
+    .outliner-item:hover { background: #1e1e28; }
+    .outliner-item.selected { background: var(--selection); }
+    
+    .outliner-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 6px;
+      color: var(--text-muted);
+    }
+    
+    .outliner-expand {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    
+    .outliner-expand:hover { color: var(--text-primary); }
+    
+    .outliner-indent {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* ========== MODES PANEL ========== */
+    .modes-panel {
+      width: 52px;
+      background: var(--bg-darker);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0;
+    }
+    
+    .mode-btn {
+      width: 40px;
+      height: 40px;
+      margin: 2px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    .mode-btn:hover { background: var(--selection); color: var(--text-primary); }
+    .mode-btn.active { background: var(--accent); color: white; }
+    
+    .mode-label {
+      font-size: 7px;
+      margin-top: 2px;
+    }
+    
+    /* ========== VIEWPORT ========== */
+    .viewport-container {
+      flex: 1;
+      position: relative;
+      background: #0a0a0e;
+      overflow: hidden;
+    }
+    
+    #viewport {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .viewport-toolbar {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .viewport-toolbar-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 20, 26, 0.9);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    
+    .viewport-toolbar-btn:hover { background: #252530; }
+    .viewport-toolbar-btn.active { background: var(--accent); color: white; }
+    
+    .viewport-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .viewport-cam {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    
+    /* ========== RIGHT PANEL ========== */
+    .right-panel {
+      width: 300px;
+      min-width: 250px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Details Panel */
+    .details-panel {
+      flex: 1;
+    }
+    
+    .details-section {
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .details-section-header {
+      height: 26px;
+      background: var(--bg-header);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    
+    .details-section-header:hover { background: #22222c; }
+    
+    .details-row {
+      display: flex;
+      align-items: center;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    
+    .details-label {
+      width: 90px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    
+    .details-value {
+      flex: 1;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .details-input {
+      flex: 1;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 3px 6px;
+      font-size: 11px;
+      border-radius: 3px;
+    }
+    
+    .details-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    /* ========== BOTTOM PANEL ========== */
+    .bottom-panel {
+      height: 180px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .bottom-panel-tabs {
+      display: flex;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .bottom-tab {
+      padding: 6px 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .bottom-tab:hover { color: var(--text-secondary); }
+    .bottom-tab.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--accent);
+    }
+    
+    .bottom-panel-content {
+      flex: 1;
+      overflow: auto;
+      padding: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    
+    .log-entry { margin: 2px 0; }
+    .log-entry.info { color: var(--text-secondary); }
+    .log-entry.warning { color: var(--warning); }
+    .log-entry.error { color: var(--error); }
+    .log-entry.success { color: var(--success); }
+    
+    /* ========== STATUS BAR ========== */
+    .status-bar {
+      height: 22px;
+      background: linear-gradient(180deg, #1a1a22 0%, #141419 100%);
+      border-top: 1px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .status-left, .status-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    
+    /* ========== SCROLLBAR ========== */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg-darker);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #3a3a48;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4a4a58;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
-    <!-- Title Bar -->
-    <header class="title-bar">
-      <div class="title-bar-drag">
-        <span class="logo">🚀 VOID IDE</span>
-        <span class="project-name" id="projectName">No project open</span>
-      </div>
-    </header>
-
-    <!-- Main Layout -->
-    <div class="main-layout">
-      <!-- Left Panel -->
-      <aside class="left-panel">
-        <!-- World Outliner -->
-        <div class="panel world-outliner">
-          <div class="panel-header">
-            <span>🌍 WORLD OUTLINER</span>
-            <button onclick="addObject()" title="Add Object">+</button>
-          </div>
-          <div class="panel-content" id="worldOutliner">
-            <div class="empty-state">No objects in scene</div>
-          </div>
-        </div>
-
-        <!-- Assets -->
-        <div class="panel assets-panel">
-          <div class="panel-header">
-            <span>📦 ASSETS</span>
-            <button onclick="importAssets()" title="Import">+</button>
-          </div>
-          <div class="panel-content" id="assetsPanel">
-            <div class="empty-state">No assets</div>
-          </div>
-        </div>
-
-        <!-- Characters -->
-        <div class="panel characters-panel">
-          <div class="panel-header">
-            <span>👥 CHARACTERS</span>
-          </div>
-          <div class="panel-content">
-            <button class="char-btn" onclick="addCharacter('player')">👤 Add Player</button>
-            <button class="char-btn" onclick="addCharacter('enemy')">👾 Add Enemy</button>
-          </div>
-        </div>
-
-        <!-- AI Tools -->
-        <div class="panel ai-tools">
-          <div class="panel-header">
-            <span>🤖 AI TOOLS</span>
-          </div>
-          <div class="panel-content">
-            <button class="ai-btn" onclick="aiGenerateWorld()">🌍 Generate World</button>
-            <button class="ai-btn" onclick="aiGenerateLevel()">📐 Generate Level</button>
-            <button class="ai-btn" onclick="aiGenerateCode()">💻 Write Code</button>
-            <button class="ai-btn" onclick="aiGenerateAssets()">🎨 Create Assets</button>
-            <button class="ai-btn" onclick="aiPlaytest()">🎮 AI Playtest</button>
-            <button class="ai-btn" onclick="aiAutoBalance()">⚖️ Auto-Balance</button>
-            <button class="ai-btn" onclick="aiFindBugs()">🐛 Find Bugs</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Center Area -->
-      <main class="center-area">
-        <!-- Toolbar -->
-        <div class="toolbar">
-          <div class="tool-group">
-            <button onclick="setMode('select')" id="tool-select" class="tool active" title="Select (V)">🖱️</button>
-            <button onclick="setMode('move')" id="tool-move" class="tool" title="Move (G)">✥</button>
-            <button onclick="setMode('rotate')" id="tool-rotate" class="tool" title="Rotate (R)">↻</button>
-            <button onclick="setMode('scale')" id="tool-scale" class="tool" title="Scale (S)">⬜</button>
-          </div>
-          <div class="tool-group">
-            <button onclick="addPrimitive('cube')" title="Cube">🧊</button>
-            <button onclick="addPrimitive('sphere')" title="Sphere">⚪</button>
-            <button onclick="addPrimitive('plane')" title="Plane">▬</button>
-            <button onclick="addPrimitive('cylinder')" title="Cylinder">⬭</button>
-            <button onclick="addPrimitive('cone')" title="Cone">🔺</button>
-            <button onclick="addPrimitive('torus')" title="Torus">🍩</button>
-          </div>
-          <div class="tool-group">
-            <button onclick="addLight('directional')" title="Sun">☀️</button>
-            <button onclick="addLight('point')" title="Point Light">💡</button>
-            <button onclick="addLight('spot')" title="Spot Light">🔦</button>
-            <button onclick="addLight('ambient')" title="Ambient">🌙</button>
-          </div>
-          <div class="tool-group">
-            <button onclick="togglePhysics()" title="Toggle Physics">⚛️</button>
-            <button onclick="initMultiplayer()" title="Multiplayer">🌐</button>
-          </div>
-        </div>
-
-        <!-- Viewport -->
-        <div class="viewport-container">
-          <canvas id="viewport"></canvas>
-          <div class="viewport-overlay">
-            <span id="viewportInfo">3D Viewport | Objects: 0 | Physics: OFF</span>
-          </div>
-        </div>
-
-        <!-- Code Editor -->
-        <div class="code-panel">
-          <div class="code-tabs">
-            <div class="code-tab active">game.js</div>
-          </div>
-          <div class="code-editor">
-            <textarea id="codeEditor" spellcheck="false" placeholder="// Write your game code here...
-// Or use AI to generate it!"></textarea>
-          </div>
-        </div>
-      </main>
-
-      <!-- Right Panel -->
-      <aside class="right-panel">
-        <!-- Properties -->
-        <div class="panel properties-panel">
-          <div class="panel-header">
-            <span>⚙️ PROPERTIES</span>
-          </div>
-          <div class="panel-content" id="propertiesPanel">
-            <div class="property-group">
-              <label>Name</label>
-              <input type="text" id="prop-name" value="Object">
-            </div>
-            <div class="property-group">
-              <label>Position</label>
-              <div class="vec3">
-                <input type="number" id="prop-pos-x" value="0" step="0.1">
-                <input type="number" id="prop-pos-y" value="0" step="0.1">
-                <input type="number" id="prop-pos-z" value="0" step="0.1">
-              </div>
-            </div>
-            <div class="property-group">
-              <label>Rotation</label>
-              <div class="vec3">
-                <input type="number" id="prop-rot-x" value="0" step="1">
-                <input type="number" id="prop-rot-y" value="0" step="1">
-                <input type="number" id="prop-rot-z" value="0" step="1">
-              </div>
-            </div>
-            <div class="property-group">
-              <label>Scale</label>
-              <div class="vec3">
-                <input type="number" id="prop-scale-x" value="1" step="0.1">
-                <input type="number" id="prop-scale-y" value="1" step="0.1">
-                <input type="number" id="prop-scale-z" value="1" step="0.1">
-              </div>
-            </div>
-            <div class="property-group">
-              <label>Material Color</label>
-              <input type="color" id="prop-color" value="#ff0000">
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Assistant -->
-        <div class="panel ai-assistant">
-          <div class="panel-header">
-            <span>🤖 AI ASSISTANT</span>
-          </div>
-          <div class="panel-content">
-            <div class="ai-quick-prompts">
-              <button onclick="askAI('player movement')">🎮 Player</button>
-              <button onclick="askAI('collision')">💥 Collision</button>
-              <button onclick="askAI('shooting')">🔫 Shoot</button>
-              <button onclick="askAI('enemy AI')">👾 Enemy</button>
-              <button onclick="askAI('physics')">⚛️ Physics</button>
-              <button onclick="askAI('multiplayer')">🌐 Network</button>
-            </div>
-            <div class="ai-input">
-              <input type="text" id="aiPrompt" placeholder="Ask AI...">
-              <button onclick="askAI(document.getElementById('aiPrompt').value)">🤖</button>
-            </div>
-            <div class="ai-response" id="aiResponse">
-              <p>👋 Hello! I'm your AI game assistant.</p>
-              <p>Click a prompt or type your own!</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+      <span class="menu-bar-title"><span>VOID</span> IDE</span>
+      <div class="menu-bar-item">File</div>
+      <div class="menu-bar-item">Edit</div>
+      <div class="menu-bar-item">View</div>
+      <div class="menu-bar-item">Window</div>
+      <div class="menu-bar-item">Help</div>
     </div>
-
+    
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="toolbar-btn" title="New Level">📄</button>
+        <button class="toolbar-btn" title="Open Level">📂</button>
+        <button class="toolbar-btn" title="Save">💾</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn" title="Undo">↶</button>
+        <button class="toolbar-btn" title="Redo">↷</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn" title="Cut">✂</button>
+        <button class="toolbar-btn" title="Copy">📋</button>
+        <button class="toolbar-btn" title="Paste">📌</button>
+        <button class="toolbar-btn" title="Delete">🗑</button>
+      </div>
+      <span class="toolbar-label">Current Level: Untitled</span>
+      <div style="flex:1"></div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn play" title="Play">▶</button>
+        <button class="toolbar-btn" title="Pause">⏸</button>
+        <button class="toolbar-btn stop" title="Stop">⏹</button>
+      </div>
+    </div>
+    
+    <!-- Main Area -->
+    <div class="main-area">
+      <!-- Left Panel -->
+      <div class="left-panel">
+        <!-- Content Browser -->
+        <div class="panel content-browser">
+          <div class="panel-header">
+            <span>Content Browser</span>
+            <button class="panel-header-btn" title="Add">+</button>
+          </div>
+          <div class="content-path">
+            <span class="content-path-item">Game</span>
+            <span class="content-path-sep">/</span>
+            <span class="content-path-item">Content</span>
+            <span class="content-path-sep">/</span>
+            <span class="content-path-item">Levels</span>
+          </div>
+          <div class="asset-grid">
+            <div class="asset-item selected" data-type="level">
+              <div class="asset-icon">🗺</div>
+              <div class="asset-name">MainLevel</div>
+            </div>
+            <div class="asset-item" data-type="folder">
+              <div class="asset-icon">📁</div>
+              <div class="asset-name">Materials</div>
+            </div>
+            <div class="asset-item" data-type="folder">
+              <div class="asset-icon">📁</div>
+              <div class="asset-name">Blueprints</div>
+            </div>
+            <div class="asset-item" data-type="folder">
+              <div class="asset-icon">📁</div>
+              <div class="asset-name">Textures</div>
+            </div>
+            <div class="asset-item" data-type="folder">
+              <div class="asset-icon">📁</div>
+              <div class="asset-name">Meshes</div>
+            </div>
+            <div class="asset-item" data-type="folder">
+              <div class="asset-icon">📁</div>
+              <div class="asset-name">Sounds</div>
+            </div>
+            <div class="asset-item" data-type="material">
+              <div class="asset-icon">🎨</div>
+              <div class="asset-name">M_Basic</div>
+            </div>
+            <div class="asset-item" data-type="blueprint">
+              <div class="asset-icon">📘</div>
+              <div class="asset-name">BP_Player</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- World Outliner -->
+        <div class="panel" style="flex:1">
+          <div class="panel-header">
+            <span>World Outliner</span>
+            <button class="panel-header-btn" title="Search">🔍</button>
+          </div>
+          <div class="panel-content outliner-tree">
+            <div class="outliner-item selected">
+              <span class="outliner-expand">▶</span>
+              <span class="outliner-icon">🗺</span>
+              <span>MainLevel</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 24px;">
+              <span class="outliner-icon">☀</span>
+              <span>DirectionalLight</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 24px;">
+              <span class="outliner-icon">📷</span>
+              <span>CameraActor</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 24px;">
+              <span class="outliner-icon">☁</span>
+              <span>SkySphere</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 24px;">
+              <span class="outliner-expand">▶</span>
+              <span class="outliner-icon">📦</span>
+              <span>Cube_01</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 40px;">
+              <span class="outliner-icon">🔲</span>
+              <span>StaticMesh</span>
+            </div>
+            <div class="outliner-item" style="padding-left: 24px;">
+              <span class="outliner-icon">🔲</span>
+              <span>Floor</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modes Panel -->
+      <div class="modes-panel">
+        <button class="mode-btn active" title="Place">
+          ➕
+          <span class="mode-label">Place</span>
+        </button>
+        <button class="mode-btn" title="Paint">
+          🖌
+          <span class="mode-label">Paint</span>
+        </button>
+        <button class="mode-btn" title="Landscape">
+          🏔
+          <span class="mode-label">Landscape</span>
+        </button>
+        <button class="mode-btn" title="Foliage">
+          🌲
+          <span class="mode-label">Foliage</span>
+        </button>
+        <button class="mode-btn" title="Geometry">
+          📐
+          <span class="mode-label">Geometry</span>
+        </button>
+        <button class="mode-btn" title="Brush">
+          🖼
+          <span class="mode-label">Brush</span>
+        </button>
+      </div>
+      
+      <!-- Viewport -->
+      <div class="viewport-container">
+        <canvas id="viewport"></canvas>
+        <div class="viewport-toolbar">
+          <button class="viewport-toolbar-btn active" title="Perspective">👁</button>
+          <button class="viewport-toolbar-btn" title="Top">⬆</button>
+          <button class="viewport-toolbar-btn" title="Front">➡</button>
+          <button class="viewport-toolbar-btn" title="Right">⬇</button>
+        </div>
+        <div class="viewport-overlay">Perspective</div>
+        <div class="viewport-cam">Camera: Perspective</div>
+      </div>
+      
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <div class="panel details-panel">
+          <div class="panel-header">
+            <span>Details</span>
+            <button class="panel-header-btn" title="Lock">🔒</button>
+          </div>
+          
+          <div class="details-section">
+            <div class="details-section-header">Transform</div>
+            <div class="details-row">
+              <span class="details-label">Location</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="0">
+                <input type="text" class="details-input" value="0">
+                <input type="text" class="details-input" value="0">
+              </div>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Rotation</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="0">
+                <input type="text" class="details-input" value="0">
+                <input type="text" class="details-input" value="0">
+              </div>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Scale</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="1">
+                <input type="text" class="details-input" value="1">
+                <input type="text" class="details-input" value="1">
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-section">
+            <div class="details-section-header">Actor</div>
+            <div class="details-row">
+              <span class="details-label">Label</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="Cube_01">
+              </div>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Static Mesh</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="SM_Cube">
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-section">
+            <div class="details-section-header">Materials</div>
+            <div class="details-row">
+              <span class="details-label">Material</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="M_Basic">
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-section">
+            <div class="details-section-header">Physics</div>
+            <div class="details-row">
+              <span class="details-label">Simulate</span>
+              <div class="details-value">
+                <input type="checkbox" checked> Enabled
+              </div>
+            </div>
+            <div class="details-row">
+              <span class="details-label">Mass (kg)</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="100">
+              </div>
+            </div>
+          </div>
+          
+          <div class="details-section">
+            <div class="details-section-header">Collision</div>
+            <div class="details-row">
+              <span class="details-label">Presets</span>
+              <div class="details-value">
+                <input type="text" class="details-input" value="BlockAll">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bottom Panel -->
+    <div class="bottom-panel">
+      <div class="bottom-panel-tabs">
+        <div class="bottom-tab active">Output Log</div>
+        <div class="bottom-tab">Console</div>
+        <div class="bottom-tab">Debug</div>
+        <div class="bottom-tab">Blueprint</div>
+      </div>
+      <div class="bottom-panel-content">
+        <div class="log-entry info">[2026.03.01-19.23.01:000] LogInit: VOID IDE - Unreal-Class Engine</div>
+        <div class="log-entry info">[2026.03.01-19.23.01:001] LogRenderer: Initialized viewport</div>
+        <div class="log-entry info">[2026.03.01-19.23.01:002] LogContentBrowser: Content path: Game/Content</div>
+        <div class="log-entry info">[2026.03.01-19.23.01:003] LogWorld: Level loaded: MainLevel</div>
+        <div class="log-entry success">[2026.03.01-19.23.01:004] LogInit: Engine ready</div>
+        <div class="log-entry info">[2026.03.01-19.23.01:005] LogTaskGraph: Initialized</div>
+      </div>
+    </div>
+    
     <!-- Status Bar -->
-    <footer class="status-bar">
+    <div class="status-bar">
       <div class="status-left">
-        <span id="statusMessage">Ready</span>
+        <div class="status-item">
+          <span class="status-dot"></span>
+          <span>Ready</span>
+        </div>
+        <div class="status-item">|</div>
+        <div class="status-item">立方体 Selected</div>
       </div>
       <div class="status-right">
-        <span id="objectCount">Objects: 0</span>
-        <span id="fpsCounter">FPS: 0</span>
-        <span>VOID IDE v1.0</span>
-      </div>
-    </footer>
-  </div>
-
-  <!-- AI Modal -->
-  <div class="modal" id="aiModal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>🤖 AI Generator</h3>
-        <button onclick="closeAIModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="ai-type-selector">
-          <button onclick="selectAIType('world')">🌍 World</button>
-          <button onclick="selectAIType('level')">📐 Level</button>
-          <button onclick="selectAIType('code')">💻 Code</button>
-          <button onclick="selectAIType('assets')">🎨 Assets</button>
-        </div>
-        <textarea id="aiPromptInput" placeholder="Describe what you want AI to create..."></textarea>
-        <button class="ai-generate-btn" onclick="generateWithAI()">🚀 Generate with AI</button>
-        <div class="ai-result" id="aiResult"></div>
+        <div class="status-item">Viewport: 1920x1080</div>
+        <div class="status-item">FPS: 60</div>
+        <div class="status-item">Draw Calls: 12</div>
+        <div class="status-item">Tris: 2.4k</div>
       </div>
     </div>
   </div>
-
-  <!-- Loading indicator -->
-  <div id="loading" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#6366f1;font-size:24px;font-weight:bold;z-index:9999;">
-    ⚡ Loading VOID IDE...
-  </div>
-
+  
   <script src="lib/three.min.js"></script>
   <script src="lib/cannon-es.js"></script>
-  <script src="renderer.js"></script>
-  <!-- <script src="renderer-min.js"></script> -->
-  <script src="plugins.js"></script>
-  <script>
-    // Hide loading when renderer is ready
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        var loading = document.getElementById('loading');
-        if (loading) loading.style.display = 'none';
-      }, 2000);
-    });
-  </script>
+  <script src="renderer-unreal.js"></script>
 </body>
 </html>

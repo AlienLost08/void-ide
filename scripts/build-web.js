@@ -35,6 +35,11 @@ const buildWeb = async () => {
   );
 
   fs.copyFileSync(
+    path.join(srcDir, 'renderer-unreal.js'),
+    path.join(outputDir, 'renderer-unreal.js')
+  );
+
+  fs.copyFileSync(
     path.join(srcDir, 'renderer-min.js'),
     path.join(outputDir, 'renderer-min.js')
   );
