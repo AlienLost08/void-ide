@@ -10,7 +10,10 @@ window.onunhandledrejection = function(event) {
   console.error('VOID IDE Unhandled Promise:', event.reason);
 };
 
-// ==================== CORE ENGINE ====================
+console.log('VOID IDE renderer.js starting...');
+
+(function() {
+  try {
 
 // Scene state
 let scene, camera, renderer, controls;
@@ -190,7 +193,9 @@ function initViewport() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
-    console.log('WebGL renderer created successfully');
+    
+    console.log('WebGL renderer created, context:', renderer.getContext() ? 'OK' : 'FAILED');
+    console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
   } catch (e) {
     console.error('WebGL error:', e);
     updateStatus('WebGL not supported!');
@@ -1976,3 +1981,7 @@ window.playGame = playGame;
 window.stopGame = stopGame;
 window.togglePhysics = togglePhysics;
 window.initMultiplayer = initMultiplayer;
+
+console.log('VOID IDE renderer.js complete');
+
+})(); // End try wrapper
