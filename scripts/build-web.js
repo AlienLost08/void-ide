@@ -4,47 +4,52 @@ const path = require('path');
 
 const buildWeb = async () => {
   console.log('🌐 Building VOID IDE for Web...');
-  
+
   const outputDir = path.join(__dirname, '..', 'dist', 'web');
-  
+
   // Create output directory
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
-  
+
   // Copy source files
   const srcDir = path.join(__dirname, '..', 'src', 'renderer');
-  
+
   // Read index.html and make it standalone
   let html = fs.readFileSync(path.join(srcDir, 'index.html'), 'utf8');
-  
+
   // Modify for web build
-  html = html.replace(/<script src="renderer\.js"><\/script>/, 
+  html = html.replace(/<script src="renderer\.js"><\/script>/,
     `<script src="renderer.js"></script>
     <script src="plugins.js"></script>`);
-  
+
   // Add standalone CSS
   html = html.replace('href="styles.css"', 'href="void-ide.css"');
-  
+
   fs.writeFileSync(path.join(outputDir, 'index.html'), html);
-  
+
   // Copy JS files
   fs.copyFileSync(
     path.join(srcDir, 'renderer.js'),
     path.join(outputDir, 'renderer.js')
   );
-  
+
+  fs.copyFileSync(
+    path.join(srcDir, 'renderer-min.js'),
+    path.join(outputDir, 'renderer-min.js')
+  );
+
   fs.copyFileSync(
     path.join(srcDir, 'plugins.js'),
     path.join(outputDir, 'plugins.js')
   );
-  
+
   // Copy and rename CSS
   fs.copyFileSync(
     path.join(srcDir, 'styles.css'),
     path.join(outputDir, 'void-ide.css')
   );
-  
+
   // Copy Three.js and Cannon.js libraries
   const libDir = path.join(srcDir, 'lib');
   const outputLibDir = path.join(outputDir, 'lib');
@@ -58,7 +63,7 @@ const buildWeb = async () => {
     fs.copyFileSync(path.join(libDir, 'cannon-es.js'), path.join(outputLibDir, 'cannon-es.js'));
   }
   console.log('✅ Copied lib files');
-  
+
   // Create standalone game runner HTML
   const gameRunner = `<!DOCTYPE html>
 <html>
@@ -77,30 +82,30 @@ const buildWeb = async () => {
   <script>
     // VOID Game Runtime
     // Your game code will be inserted here
-    
+
     // Default game loop
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
-    
+
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-    
+
     // Lights
     scene.add(new THREE.AmbientLight(0x404040));
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
     scene.add(light);
-    
+
     // Add your objects here
-    
+
     function animate() {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     }
     animate();
-    
+
     // Handle resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -110,9 +115,9 @@ const buildWeb = async () => {
   </script>
 </body>
 </html>`;
-  
+
   fs.writeFileSync(path.join(outputDir, 'game-template.html'), gameRunner);
-  
+
   // Create service worker for offline support
   const serviceWorker = `
 const CACHE_NAME = 'void-ide-v1';
@@ -136,9 +141,9 @@ self.addEventListener('fetch', (event) => {
   );
 });
 `;
-  
+
   fs.writeFileSync(path.join(outputDir, 'sw.js'), serviceWorker);
-  
+
   // Create manifest.json for PWA
   const manifest = {
     name: "VOID IDE",
@@ -156,12 +161,12 @@ self.addEventListener('fetch', (event) => {
       }
     ]
   };
-  
+
   fs.writeFileSync(
     path.join(outputDir, 'manifest.json'),
     JSON.stringify(manifest, null, 2)
   );
-  
+
   console.log('✅ Web build complete!');
   console.log('📁 Output:', outputDir);
   console.log('');
